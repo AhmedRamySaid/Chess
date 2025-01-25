@@ -20,6 +20,7 @@ public class Chess extends Application {
     @Override
     public void start(Stage primaryStage) throws IOException {
         primaryStage.show();
+        primaryStage.setTitle("Chess");
         FXMLLoader mainMenu = new FXMLLoader(getClass().getResource("/kyra/me/chess/scenes/main-menu.fxml"));
         Scene scene = mainMenu.load();
         primaryStage.setScene(scene);

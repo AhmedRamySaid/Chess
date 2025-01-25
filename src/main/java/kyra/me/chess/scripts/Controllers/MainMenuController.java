@@ -11,6 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import kyra.me.chess.scripts.GameManager;
 import kyra.me.chess.scripts.pieces.Piece;
 import kyra.me.chess.scripts.tile.Tile;
 
@@ -39,7 +40,7 @@ public class MainMenuController {
                 padding
         ));
 
-        for (int i = 1; i < 8; i++) {
+        for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
                 // Create the StackPane to hold the Tile
                 StackPane stackPane = new StackPane();
@@ -51,16 +52,13 @@ public class MainMenuController {
                 stackPane.prefWidthProperty().bind(binding.divide(10));
                 stackPane.prefHeightProperty().bind(binding.divide(10));
 
-                if (j == 2 && i == 2){
-                    Piece piece = new Piece(tile);
-                }
                 // Add the StackPane to the GridPane
                 gridPane.add(stackPane, i-1, 8-j); //GridPane adds from the top-left and starts from (0,0)
             }
         }
 
         primaryStage.setScene(new Scene(centerPane,600,600));
-        primaryStage.show();
+        GameManager.gameStart();
     }
 
     @FXML

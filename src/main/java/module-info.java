@@ -9,4 +9,6 @@ module kyra.me.chess {
     opens kyra.me.chess.scripts.Controllers to javafx.fxml;
     exports kyra.me.chess.scripts;
     opens kyra.me.chess.scripts to javafx.fxml;
+    exports kyra.me.chess.scripts.move;
+    opens kyra.me.chess.scripts.move to javafx.fxml;
 }
