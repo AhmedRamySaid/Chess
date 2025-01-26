@@ -1,14 +1,18 @@
 package kyra.me.chess.scripts;
 
+import kyra.me.chess.scripts.move.Move;
 import kyra.me.chess.scripts.pieces.*;
 
 import javax.sound.sampled.*;
 import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class GameManager {
     public static String FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
-    public static boolean isWhiteTurn = false; //will change to true on start
+    public static boolean isWhiteTurn = true; //will change to true on start
     public static Clip[] audio = new Clip[2];
 
     public static void gameStart(){
@@ -48,11 +52,11 @@ public class GameManager {
                     col++;
                     break;
                 case 'k':
-                    //new Piece(Database.getTile(col, row), false);
+                    new King(Database.getTile(col, row), false);
                     col++;
                     break;
                 case 'K':
-                    //new Piece(Database.getTile(col, row), true);
+                    new King(Database.getTile(col, row), true);
                     col++;
                     break;
                 case 'p':
@@ -94,11 +98,29 @@ public class GameManager {
     }
     public static void turnStart(){
         Database.clearMoves();
-        isWhiteTurn = !isWhiteTurn;
-        for (Piece piece: Database.getPieces()){
+        for (Piece piece: Database.getPieces()){ //move creation
             if (isWhiteTurn == piece.isWhite()){
                 piece.createMoves(Database.getMoves(), true);
             }
         }
+
+        List<Move> moves = new ArrayList<>(); //move validation
+        Iterator<Move> iterator = Database.getMoves().iterator();
+        while (iterator.hasNext()){
+            Move move = iterator.next();
+
+            move.doMoveTemporary();
+            for (Piece piece: Database.getPieces()){
+                if (isWhiteTurn == piece.isWhite()){
+                    piece.createMoves(moves, false);
+                }
+            }
+            moves.stream().filter(t -> t.getCapturedPiece() instanceof King).findAny().ifPresent(
+                    badMove -> { iterator.remove(); }
+            );
+            move.undoMove();
+            moves.clear();
+        }
+        System.out.println(Database.getMoves().size());
     }
 }

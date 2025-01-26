@@ -18,15 +18,14 @@ public class Knight extends Piece {
 
     @Override
     public void createMoves(List<Move> moves, boolean isMoveCreation){
-        pieceMoves.clear();
         int[] values = {1, 2};
 
         // Iterate through {1, 2}, {-1, 2}, {1, -2}, {-1, -2}
         for (int i = 0; i < 4; i++) {
             Tile t = Database.getTile(occupiedTile.getXPosition() + values[0], occupiedTile.getYPosition() + values[1]);
-            this.addMove(moves, isMoveCreation, t);
+            this.addMove(moves, t);
             t = Database.getTile(occupiedTile.getXPosition() + values[1], occupiedTile.getYPosition() + values[0]);
-            this.addMove(moves, isMoveCreation, t);
+            this.addMove(moves, t);
 
             // Perform the transformation
             if (i % 2 == 0) {

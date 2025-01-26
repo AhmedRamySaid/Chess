@@ -15,12 +15,12 @@ public interface DiagonalMovingPiece {
             Tile t = Database.getTile(x, y);
             if (t.getOccupyingPiece() != null){
                 if (t.getOccupyingPiece().isWhite() != piece.isWhite()) {
-                    piece.addMove(moves, isMoveCreation, t);
+                    piece.addMove(moves, t);
                 }
                 return;
             }
 
-            piece.addMove(moves, isMoveCreation, t);
+            piece.addMove(moves, t);
             x += xDirection;
             y += yDirection;
         }

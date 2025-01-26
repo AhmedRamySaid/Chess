@@ -23,6 +23,7 @@ public class Database {
     public static void removePiece(Piece piece) { pieces.remove(piece); }
     public static List<Piece> getPieces() { return pieces; }
     public static void addMove(Move move) { moves.add(move); }
+    public static void removeMove(Move move) { moves.remove(move); }
     public static List<Move> getMoves() { return moves; }
     public static void clearMoves() { moves.clear(); }
     public static void setSelectedPiece(Piece piece) {

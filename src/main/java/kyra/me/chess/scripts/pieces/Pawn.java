@@ -21,12 +21,11 @@ public class Pawn extends Piece {
     }
     @Override
     public void createMoves(List<Move> moves, boolean isMoveCreation){
-        pieceMoves.clear();
         int color = isWhite? 1: -1; //if white, the pawn goes up. if black, the pawn goes down
         Tile t = Database.getTile(occupiedTile.getXPosition(), occupiedTile.getYPosition() + color);
         if (t != null) {
             if (t.getOccupyingPiece() == null) {
-                this.addMove(moves, isMoveCreation, t);
+                this.addMove(moves, t);
             }
         }
 
@@ -34,7 +33,7 @@ public class Pawn extends Piece {
         if (t != null) {
             if (t.getOccupyingPiece() != null) {
                 if (t.getOccupyingPiece().isWhite() != isWhite()) {
-                    this.addMove(moves, isMoveCreation, t);
+                    this.addMove(moves, t);
                 }
             }
         }
@@ -43,7 +42,7 @@ public class Pawn extends Piece {
         if (t != null) {
             if (t.getOccupyingPiece() != null) {
                 if (t.getOccupyingPiece().isWhite() != isWhite()) {
-                    this.addMove(moves, isMoveCreation, t);
+                    this.addMove(moves, t);
                 }
             }
         }
@@ -52,7 +51,7 @@ public class Pawn extends Piece {
             t = Database.getTile(occupiedTile.getXPosition(), occupiedTile.getYPosition() + 2 * color);
             if (t != null) {
                 if (t.getOccupyingPiece() == null) {
-                    this.addMove(moves, isMoveCreation, t);
+                    this.addMove(moves, t);
                 }
             }
         }

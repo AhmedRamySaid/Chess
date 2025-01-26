@@ -17,7 +17,6 @@ public class Queen extends Piece implements DiagonalMovingPiece{
 
     @Override
     public void createMoves(List<Move> moves, boolean isMoveCreation) {
-        pieceMoves.clear();
         createDiagonalMove(moves, isMoveCreation, this, 0, 1);
         createDiagonalMove(moves, isMoveCreation, this, 0, -1);
         createDiagonalMove(moves, isMoveCreation, this, 1, 0);
