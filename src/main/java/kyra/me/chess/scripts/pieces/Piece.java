@@ -6,28 +6,28 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import kyra.me.chess.scripts.Database;
-import kyra.me.chess.scripts.GameManager;
 import kyra.me.chess.scripts.move.Move;
 import kyra.me.chess.scripts.tile.Tile;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Piece extends ImageView {
+public abstract class Piece extends ImageView {
     Tile occupiedTile;
     boolean isWhite;
-    Image model;
-    StackPane stackPane;
-    List<Move> moves;
+    boolean hasMoved;
+    //white pawn  (0), black pawn (1), white knight (2), black knight (3), white bishop (4), black bishop (5),
+    // white rook (6), black rook (7), white queen (8), black queen (9), white king (10), black king (11)
+    static Image[] models = {new Image(Piece.class.getResourceAsStream("/kyra/me/chess/assets/models/white pawn.png")), new Image(Piece.class.getResourceAsStream("/kyra/me/chess/assets/models/black pawn.png")), new Image(Piece.class.getResourceAsStream("/kyra/me/chess/assets/models/white knight.png")), new Image(Piece.class.getResourceAsStream("/kyra/me/chess/assets/models/black knight.png")), new Image(Piece.class.getResourceAsStream("/kyra/me/chess/assets/models/white bishop.png")), new Image(Piece.class.getResourceAsStream("/kyra/me/chess/assets/models/black bishop.png")), new Image(Piece.class.getResourceAsStream("/kyra/me/chess/assets/models/white rook.png")), new Image(Piece.class.getResourceAsStream("/kyra/me/chess/assets/models/black rook.png")), new Image(Piece.class.getResourceAsStream("/kyra/me/chess/assets/models/white queen.png")), new Image(Piece.class.getResourceAsStream("/kyra/me/chess/assets/models/black queen.png")), new Image(Piece.class.getResourceAsStream("/kyra/me/chess/assets/models/white king.png")), new Image(Piece.class.getResourceAsStream("/kyra/me/chess/assets/models/black king.png"))};
+    List<Move> pieceMoves;
 
     public Piece(Tile tile, boolean isWhite) {
-        super(new Image(Piece.class.getResourceAsStream("/kyra/me/chess/assets/colette.jpg")));
         this.isWhite = isWhite;
         this.setPreserveRatio(true);
         this.setFitHeight(40);
         occupiedTile = tile;
-        moves = new ArrayList<>();
-        this.stackPane = tile.getStackPane();
+        pieceMoves = new ArrayList<>();
+        tile.getStackPane().getChildren().add(this);
 
         setOnMouseClicked(event -> {
             occupiedTile.fireEvent(new MouseEvent(MouseEvent.MOUSE_CLICKED,0, 0, 0, 0, MouseButton.PRIMARY, 1,
@@ -36,39 +36,46 @@ public class Piece extends ImageView {
         tile.setOccupyingPiece(this);
         Database.addPiece(this);
 
-        this.fitWidthProperty().bind(stackPane.prefWidthProperty());
-        this.fitHeightProperty().bind(stackPane.prefHeightProperty());
-        stackPane.getChildren().add(this);
+        this.fitWidthProperty().bind(getStackPane().prefWidthProperty());
+        this.fitHeightProperty().bind(getStackPane().prefHeightProperty());
     }
 
     public void moveTo(Tile newTile){
-        Move move = moves.stream().filter(t -> t.getStartingSquare().equals(occupiedTile) && t.getEndingSquare().equals(newTile)).findFirst().orElse(null);
+        Move move = pieceMoves.stream().filter(t -> t.getStartingSquare().equals(occupiedTile) && t.getEndingSquare().equals(newTile)).findFirst().orElse(null);
         if (move == null) {
             return;
         }
         move.doMove();
     }
 
-    public void addMove(Move move){ moves.add(move); }
-    public List<Move> getMoves() { return moves; }
-    public void createMoves(){
-        Tile[][] tiles = Database.getTiles();
-        for (int i = 0; i < 1; i++) {
-            for (int j = 0; j < 8; j++) {
-                if (tiles[i][j].equals(occupiedTile)) { continue; }
-                Move move = new Move(occupiedTile, tiles[i][j]);
-                moves.add(move);
-                Database.addMove(move);
-            }
-        }
-    }
+    abstract public void createMoves(List<Move> moves, boolean isMoveCreation);
+
     public void destroy() {
         Database.removePiece(this);
         occupiedTile.setOccupyingPiece(null);
-        stackPane.getChildren().remove(this);
+        getStackPane().getChildren().remove(this);
     }
-    public StackPane getStackPane() { return stackPane; }
-    public void setStackPane(StackPane stackPane) { this.stackPane = stackPane; }
+
+    //to prevent the method from changing the list when validating legal moves
+    //validation is done to remove moves that puts the king in check
+    public void addMove(List<Move> moves, boolean isMoveCreation, Tile endTile){
+        if (endTile == null) { return; }
+        if (endTile.getOccupyingPiece() != null) {
+            if (endTile.getOccupyingPiece().isWhite() == isWhite()) {
+                return;
+            }
+        }
+        Move move = new Move(occupiedTile, endTile);
+        moves.add(move);
+        if (isMoveCreation) {
+            pieceMoves.add(move);
+        }
+    }
+
+    public List<Move> getMoves() { return pieceMoves; }
+    public StackPane getStackPane() { return (StackPane)getParent(); }
+    public Tile getOccupiedTile() { return occupiedTile; }
     public void setOccupiedTile(Tile occupiedTile) { this.occupiedTile = occupiedTile; }
     public boolean isWhite() { return isWhite; }
+    public void setHasMoved(boolean moved) { this.hasMoved = moved; }
 }

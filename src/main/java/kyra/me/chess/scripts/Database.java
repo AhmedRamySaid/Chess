@@ -15,18 +15,28 @@ public class Database {
 
     public static void addTile(Tile tile) { tiles[tile.getXPosition()-1][tile.getYPosition()-1] = tile; }
     public static Tile[][] getTiles() { return tiles; }
-    public static Tile getTile(int x, int y) { return tiles[x-1][y-1]; }
+    public static Tile getTile(int x, int y) {
+        if (x <= 0 || x > 8 || y <= 0 || y > 8) { return null; }
+        return tiles[x-1][y-1];
+    }
     public static void addPiece(Piece piece) { pieces.add(piece); }
     public static void removePiece(Piece piece) { pieces.remove(piece); }
     public static List<Piece> getPieces() { return pieces; }
     public static void addMove(Move move) { moves.add(move); }
+    public static List<Move> getMoves() { return moves; }
     public static void clearMoves() { moves.clear(); }
     public static void setSelectedPiece(Piece piece) {
-        selectedPiece = piece;
-        if (piece == null) { return; }
-        for (Move move: selectedPiece.getMoves()) {
-            move.getEndingSquare().togglePlayableMoveOn();
+        if (selectedPiece != null) {
+            for (Move move: selectedPiece.getMoves()) {
+                move.getEndingSquare().togglePlayableMoveOff();
+            }
         }
+        if (piece != null) {
+            for (Move move: piece.getMoves()) {
+                move.getEndingSquare().togglePlayableMoveOn();
+            }
+        }
+        selectedPiece = piece;
     }
     public static Piece getSelectedPiece() { return selectedPiece; }
 }

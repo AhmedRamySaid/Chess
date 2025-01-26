@@ -14,10 +14,9 @@ public class Tile extends Rectangle {
     private final int yPosition;
     private Piece occupyingPiece;
     private Circle playableMove;
-    StackPane stackPane;
 
-    public Tile(int x, int y, StackPane p){
-        stackPane = p;
+    public Tile(int x, int y, StackPane pane) {
+        pane.getChildren().add(this);
         xPosition = x;
         yPosition = y;
 
@@ -60,18 +59,23 @@ public class Tile extends Rectangle {
             }
         });
 
-        this.setColor(Color.WHITE, Color.BLACK);
-        this.widthProperty().bind(stackPane.prefWidthProperty());
-        this.heightProperty().bind(stackPane.prefHeightProperty());
+        this.setColor(Color.WHITE, Color.SADDLEBROWN);
+        this.widthProperty().bind(getStackPane().prefWidthProperty());
+        this.heightProperty().bind(getStackPane().prefHeightProperty());
         Database.addTile(this);
-        stackPane.getChildren().addAll(this, playableMove);
+        getStackPane().getChildren().add(playableMove);
     }
 
     public void togglePlayableMoveOn(){
-        playableMove.setOpacity(0.5);
+        if (occupyingPiece == null) {
+            playableMove.setOpacity(0.5);
+        } else {
+            setColor(Color.RED, Color.RED);
+        }
     }
     public void togglePlayableMoveOff(){
         playableMove.setOpacity(0);
+        setColor(Color.WHITE, Color.SADDLEBROWN);
     }
 
     public void setColor(Color mainColor, Color offsetColor) {
@@ -94,7 +98,7 @@ public class Tile extends Rectangle {
 
     public void setOccupyingPiece(Piece piece) { occupyingPiece = piece; }
     public Piece getOccupyingPiece() { return occupyingPiece; }
-    public StackPane getStackPane() { return stackPane; }
+    public StackPane getStackPane() { return (StackPane)getParent(); }
     public int getXPosition(){ return xPosition; }
     public int getYPosition(){ return yPosition; }
 }

@@ -28,24 +28,29 @@ public class Move {
             capturedPiece = end.getOccupyingPiece();
             moveType = MoveType.capture;
         }
-        this.movingPiece.addMove(this);
     }
     public void doMove(){
         switch (moveType){
             case normal:
+                GameManager.audio[0].stop(); //resets the audio clip so it can be replayed
+                GameManager.audio[0].setFramePosition(0);
+                GameManager.audio[0].start();
                 break;
             case capture:
                 capturedPiece.destroy();
+                GameManager.audio[1].stop();
+                GameManager.audio[1].setFramePosition(0);
+                GameManager.audio[1].start();
                 break;
         }
-        movingPiece.getStackPane().getChildren().remove(this);
+        movingPiece.setHasMoved(true);
+        movingPiece.getStackPane().getChildren().remove(movingPiece);
 
         startingSquare.setOccupyingPiece(null);
         movingPiece.setOccupiedTile(endingSquare);
         endingSquare.setOccupyingPiece(movingPiece);
         Database.setSelectedPiece(null);
 
-        movingPiece.setStackPane(endingSquare.getStackPane());
         endingSquare.getStackPane().getChildren().add(movingPiece);
         for (Move m: movingPiece.getMoves()){
             m.getEndingSquare().togglePlayableMoveOff();

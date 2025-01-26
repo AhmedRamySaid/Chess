@@ -46,7 +46,7 @@ public class MainMenuController {
                 StackPane stackPane = new StackPane();
 
                 // Create the Tile (Rectangle)
-                Tile tile = new Tile(i, j, stackPane);
+                new Tile(i, j, stackPane);
 
                 // Bind the StackPane size to the available space in the GridPane
                 stackPane.prefWidthProperty().bind(binding.divide(10));

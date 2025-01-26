@@ -1,7 +1,7 @@
 module kyra.me.chess {
     requires javafx.controls;
     requires javafx.fxml;
-
+    requires java.desktop;
 
     opens kyra.me.chess to javafx.fxml;
     exports kyra.me.chess;
