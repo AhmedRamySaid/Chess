@@ -1,4 +1,4 @@
-package kyra.me.chess.scripts.Controllers;
+package kyra.me.chess.scripts.controllers;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.NumberBinding;
@@ -11,8 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import kyra.me.chess.scripts.GameManager;
-import kyra.me.chess.scripts.pieces.Piece;
+import kyra.me.chess.scripts.managers.GameManager;
 import kyra.me.chess.scripts.tile.Tile;
 
 import java.io.IOException;

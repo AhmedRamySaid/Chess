@@ -1,6 +1,6 @@
 package kyra.me.chess.scripts.pieces;
 
-import kyra.me.chess.scripts.Database;
+import kyra.me.chess.scripts.managers.Database;
 import kyra.me.chess.scripts.move.Move;
 import kyra.me.chess.scripts.tile.Tile;
 
@@ -17,7 +17,7 @@ public class Knight extends Piece {
     }
 
     @Override
-    public void createMoves(List<Move> moves, boolean isMoveCreation){
+    public void createMoves(List<Move> moves){
         int[] values = {1, 2};
 
         // Iterate through {1, 2}, {-1, 2}, {1, -2}, {-1, -2}

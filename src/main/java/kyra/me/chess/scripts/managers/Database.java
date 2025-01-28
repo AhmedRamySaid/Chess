@@ -1,4 +1,4 @@
-package kyra.me.chess.scripts;
+package kyra.me.chess.scripts.managers;
 
 import kyra.me.chess.scripts.move.Move;
 import kyra.me.chess.scripts.pieces.Piece;
@@ -40,4 +40,11 @@ public class Database {
         selectedPiece = piece;
     }
     public static Piece getSelectedPiece() { return selectedPiece; }
+
+    public static void emptyAll(){
+        tiles = new Tile[8][8];
+        pieces = new ArrayList<>();
+        moves = new ArrayList<>();
+        selectedPiece = null;
+    }
 }

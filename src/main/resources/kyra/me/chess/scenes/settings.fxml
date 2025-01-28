@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<Scene fx:id="SettingsScene" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="kyra.me.chess.scripts.Controllers.SettingsController">
+<Scene fx:id="SettingsScene" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="kyra.me.chess.scripts.controllers.SettingsController">
    <root>
       <Pane style="-fx-background-color: #aed9e5;">
          <children>

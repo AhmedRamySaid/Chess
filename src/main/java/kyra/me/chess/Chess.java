@@ -16,9 +16,11 @@ public class Chess extends Application {
     List<Piece> pieces = new ArrayList<Piece>();
     Color tileMainColor =Color.LIGHTGRAY;
     Color tileOffsetColor = Color.BROWN;
+    public static Stage primaryStage;
 
     @Override
     public void start(Stage primaryStage) throws IOException {
+        Chess.primaryStage = primaryStage;
         primaryStage.show();
         primaryStage.setTitle("Chess");
         FXMLLoader mainMenu = new FXMLLoader(getClass().getResource("/kyra/me/chess/scenes/main-menu.fxml"));

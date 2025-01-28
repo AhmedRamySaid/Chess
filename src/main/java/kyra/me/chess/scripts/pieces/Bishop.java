@@ -16,10 +16,10 @@ public class Bishop extends Piece implements DiagonalMovingPiece{
     }
 
     @Override
-    public void createMoves(List<Move> moves, boolean isMoveCreation) {
-        createDiagonalMove(moves, isMoveCreation, this, 1, 1);
-        createDiagonalMove(moves, isMoveCreation, this, -1, 1);
-        createDiagonalMove(moves, isMoveCreation, this, 1, -1);
-        createDiagonalMove(moves, isMoveCreation, this, -1, -1);
+    public void createMoves(List<Move> moves) {
+        createDiagonalMove(moves, this, 1, 1);
+        createDiagonalMove(moves, this, -1, 1);
+        createDiagonalMove(moves, this, 1, -1);
+        createDiagonalMove(moves, this, -1, -1);
     }
 }

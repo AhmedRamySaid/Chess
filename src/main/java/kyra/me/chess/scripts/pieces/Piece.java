@@ -5,11 +5,10 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
-import kyra.me.chess.scripts.Database;
+import kyra.me.chess.scripts.managers.Database;
 import kyra.me.chess.scripts.move.Move;
 import kyra.me.chess.scripts.tile.Tile;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,7 +55,7 @@ public abstract class Piece extends ImageView {
         move.doMove();
     }
 
-    abstract public void createMoves(List<Move> moves, boolean isMoveCreation);
+    abstract public void createMoves(List<Move> moves);
 
     public void destroy() {
         Database.removePiece(this);

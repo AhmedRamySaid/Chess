@@ -1,13 +1,13 @@
 package kyra.me.chess.scripts.pieces;
 
-import kyra.me.chess.scripts.Database;
+import kyra.me.chess.scripts.managers.Database;
 import kyra.me.chess.scripts.move.Move;
 import kyra.me.chess.scripts.tile.Tile;
 
 import java.util.List;
 
 public interface DiagonalMovingPiece {
-    default void createDiagonalMove(List<Move> moves, boolean isMoveCreation, Piece piece, int xDirection, int yDirection){
+    default void createDiagonalMove(List<Move> moves, Piece piece, int xDirection, int yDirection){
         int x = piece.getOccupiedTile().getXPosition() + xDirection;
         int y = piece.getOccupiedTile().getYPosition() + yDirection;
 

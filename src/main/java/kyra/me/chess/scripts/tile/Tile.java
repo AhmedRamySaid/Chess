@@ -5,8 +5,8 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
-import kyra.me.chess.scripts.Database;
-import kyra.me.chess.scripts.GameManager;
+import kyra.me.chess.scripts.managers.Database;
+import kyra.me.chess.scripts.managers.GameManager;
 import kyra.me.chess.scripts.pieces.Piece;
 
 public class Tile extends Rectangle {

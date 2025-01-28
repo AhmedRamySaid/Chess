@@ -1,52 +1,69 @@
 package kyra.me.chess.scripts.move;
 
-import kyra.me.chess.scripts.Database;
-import kyra.me.chess.scripts.GameManager;
+import kyra.me.chess.scripts.managers.Database;
+import kyra.me.chess.scripts.managers.GameManager;
+import kyra.me.chess.scripts.pieces.King;
 import kyra.me.chess.scripts.pieces.Piece;
+import kyra.me.chess.scripts.pieces.Queen;
+import kyra.me.chess.scripts.pieces.Rook;
 import kyra.me.chess.scripts.tile.Tile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Move {
-    private Piece movingPiece;
-    private Piece capturedPiece;
-    private Tile startingSquare;
-    private Tile endingSquare;
-    private MoveType moveType;
-    private boolean movingPieceHasMoved;
+    private final Piece movingPiece;
+    private final Piece capturedPiece;
+    private final Tile startingSquare;
+    private final Tile endingSquare;
+    private final MoveType moveType;
+    private final boolean isCapture;
+    private boolean isCheck;
+
+    private final Rook castlingRook;
+    private final Tile castlingRookEndTile;
 
     public Move(Tile start, Tile end){
+        this(start, end, MoveType.normal);
+    }
+    public Move (Tile start, Tile end, MoveType moveType){
+        this(start, end, moveType, null, null);
+    }
+    public Move(Tile start, Tile end, MoveType moveType, Rook rook, Tile rookEndTile){
         if (start.getOccupyingPiece() == null){
             throw new IllegalArgumentException("starting piece is null");
         }
+
+        this.castlingRook = rook;
+        this.castlingRookEndTile = rookEndTile;
         this.movingPiece = start.getOccupyingPiece();
         this.startingSquare = start;
         this.endingSquare = end;
-        this.movingPieceHasMoved = movingPiece.getHasMoved();
+        this.moveType = moveType;
 
-        if (end.getOccupyingPiece() == null){
-            capturedPiece = null;
-            moveType = MoveType.normal;
-        }
-        else {
-            capturedPiece = end.getOccupyingPiece();
-            moveType = MoveType.capture;
+        switch(this.moveType){
+            case normal:
+                capturedPiece = end.getOccupyingPiece();
+                isCapture = capturedPiece != null;
+                break;
+            case enPassant:
+                capturedPiece = GameManager.lastMove.getMovingPiece();
+                isCapture = true;
+                break;
+            case castling:
+                capturedPiece = null;
+                isCapture = false;
+                break;
+            default:
+                capturedPiece = null;
+                isCapture = false;
+                break;
         }
     }
+
     public void doMove(){
-        switch (moveType){
-            case normal:
-                GameManager.audio[0].stop(); //resets the audio clip so it can be replayed
-                GameManager.audio[0].setFramePosition(0);
-                GameManager.audio[0].start();
-                break;
-            case capture:
-                capturedPiece.destroy();
-                GameManager.audio[1].stop();
-                GameManager.audio[1].setFramePosition(0);
-                GameManager.audio[1].start();
-                break;
-        }
+        if (isCapture) { capturedPiece.destroy(); }
+
         movingPiece.setHasMoved(true);
         movingPiece.getStackPane().getChildren().remove(movingPiece);
 
@@ -56,21 +73,42 @@ public class Move {
         Database.setSelectedPiece(null);
 
         endingSquare.getStackPane().getChildren().add(movingPiece);
+
         for (Move m: movingPiece.getMoves()){
             m.getEndingSquare().togglePlayableMoveOff();
         }
         GameManager.isWhiteTurn = !GameManager.isWhiteTurn;
+        GameManager.lastMove = this;
+
+        switch(moveType) {
+            case enPassant:
+                movingPiece.destroy();
+                new Queen(endingSquare, !GameManager.isWhiteTurn);
+                break;
+            case castling:
+                castlingRook.setHasMoved(true);
+                castlingRook.getStackPane().getChildren().remove(castlingRook);
+
+                castlingRook.getOccupiedTile().setOccupyingPiece(null);
+                castlingRook.setOccupiedTile(castlingRookEndTile);
+                castlingRookEndTile.setOccupyingPiece(castlingRook);
+
+                castlingRookEndTile.getStackPane().getChildren().add(castlingRook);
+                break;
+            default:
+                break;
+        }
+
         GameManager.turnStart();
     }
 
     public void doMoveTemporary(){
-        switch (moveType){
-            case normal:
-                break;
-            case capture:
-                Database.removePiece(capturedPiece);
-                break;
+        if (isCapture){
+            Database.removePiece(capturedPiece);
         }
+
+        this.movingPieceHasMoved = movingPiece.getHasMoved();
+        this.lastMove = GameManager.lastMove;
 
         movingPiece.setHasMoved(true);
         startingSquare.setOccupyingPiece(null);
@@ -80,24 +118,33 @@ public class Move {
         GameManager.isWhiteTurn = !GameManager.isWhiteTurn;
     }
     public void undoMove(){
-        switch (moveType){
-            case normal:
-                break;
-            case capture:
-                Database.addPiece(capturedPiece);
-                break;
+        if (isCapture){
+            Database.addPiece(capturedPiece);
         }
 
-        movingPiece.setHasMoved(movingPieceHasMoved);
+        movingPiece.setHasMoved(this.movingPieceHasMoved);
+        GameManager.lastMove = this.lastMove;
+
         startingSquare.setOccupyingPiece(movingPiece);
         endingSquare.setOccupyingPiece(capturedPiece);
         movingPiece.setOccupiedTile(startingSquare);
 
         GameManager.isWhiteTurn = !GameManager.isWhiteTurn;
     }
+    public void initializeIsCheck(){
+        List<Move> m = new ArrayList<>();
+        movingPiece.createMoves(m);
+        isCheck = m.stream().anyMatch(t -> t.capturedPiece instanceof King);
+    }
 
+    public boolean isCheck() { return isCheck; }
+    public boolean isCapture() { return isCapture; }
     public Tile getStartingSquare() { return startingSquare; }
     public Tile getEndingSquare() { return endingSquare; }
     public Piece getMovingPiece() { return movingPiece; }
     public Piece getCapturedPiece() { return capturedPiece; }
+    public MoveType getType() { return moveType; }
+
+    private boolean movingPieceHasMoved;
+    private Move lastMove;
 }

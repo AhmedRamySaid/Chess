@@ -1,4 +1,4 @@
-package kyra.me.chess.scripts.Controllers;
+package kyra.me.chess.scripts.controllers;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;

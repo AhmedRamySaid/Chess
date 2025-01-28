@@ -1,5 +1,10 @@
-package kyra.me.chess.scripts;
+package kyra.me.chess.scripts.managers;
 
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.stage.Stage;
+import kyra.me.chess.Chess;
 import kyra.me.chess.scripts.move.Move;
 import kyra.me.chess.scripts.pieces.*;
 
@@ -11,13 +16,18 @@ import java.util.Iterator;
 import java.util.List;
 
 public class GameManager {
-    public static String FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+    public static String FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w";
     public static boolean isWhiteTurn = true; //will change to true on start
-    public static Clip[] audio = new Clip[2];
+    public static Clip[] audio = new Clip[3];
+    public static GameState gameState;
+    public static Move lastMove;
 
     public static void gameStart(){
+        gameState = GameState.normal;
+        lastMove = null;
         int col = 1, row = 8;
-        for (char c: FEN.toCharArray()) {
+        for (int i = 0; i < FEN.length(); i++) {
+            char c = FEN.charAt(i);
             switch (c) {
                 case 'r':
                     new Rook(Database.getTile(col, row), false);
@@ -71,6 +81,15 @@ public class GameManager {
                     col = 1;
                     row--;
                     break;
+                case 'w':
+                    isWhiteTurn = true;
+                    break;
+                case ' ':
+                    if (FEN.charAt(i+1) == 'w') {
+                        isWhiteTurn = true;
+                    } else if (FEN.charAt(i+1) == 'b') {
+                        isWhiteTurn = false; }
+                    break;
                 default:
                     col += c - '0';
                     break;
@@ -92,6 +111,14 @@ public class GameManager {
             Clip captureClip = AudioSystem.getClip();
             captureClip.open(audioInputStream);
             audio[1] = captureClip;
+
+            BufferedInputStream checkStream = new BufferedInputStream(
+                    GameManager.class.getResourceAsStream("/kyra/me/chess/assets/audio/check.wav")
+            );
+            audioInputStream = AudioSystem.getAudioInputStream(checkStream);
+            Clip checkClip = AudioSystem.getClip();
+            checkClip.open(audioInputStream);
+            audio[2] = checkClip;
         }
         catch (UnsupportedAudioFileException | LineUnavailableException | IOException ex) {System.out.println(ex);}
         turnStart();
@@ -100,7 +127,7 @@ public class GameManager {
         Database.clearMoves();
         for (Piece piece: Database.getPieces()){ //move creation
             if (isWhiteTurn == piece.isWhite()){
-                piece.createMoves(Database.getMoves(), true);
+                piece.createMoves(Database.getMoves());
             }
         }
 
@@ -112,15 +139,70 @@ public class GameManager {
             move.doMoveTemporary();
             for (Piece piece: Database.getPieces()){
                 if (isWhiteTurn == piece.isWhite()){
-                    piece.createMoves(moves, false);
+                    piece.createMoves(moves);
                 }
             }
-            moves.stream().filter(t -> t.getCapturedPiece() instanceof King).findAny().ifPresent(
-                    badMove -> { iterator.remove(); }
+            moves.stream().filter(t -> t.getCapturedPiece() instanceof King).findAny().ifPresentOrElse(
+                    badMove -> iterator.remove(), move::initializeIsCheck
             );
             move.undoMove();
             moves.clear();
         }
-        System.out.println(Database.getMoves().size());
+        checkWinner();
+        playAudio();
+    }
+
+    public static void checkWinner(){
+        if (Database.getMoves().isEmpty()){
+            isWhiteTurn = !isWhiteTurn;
+            for (Piece piece: Database.getPieces()){
+                if (isWhiteTurn == piece.isWhite()){
+                    piece.createMoves(Database.getMoves());
+                }
+            }
+
+            if (!lastMove.isCheck()){
+                gameState = GameState.draw;
+            }
+            else if (isWhiteTurn){
+                gameState = GameState.whiteWon;
+            }
+            else { gameState = GameState.blackWon; }
+
+            Database.emptyAll();
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Game ended");
+            alert.setContentText(gameState.toString());
+            alert.showAndWait();
+
+            Stage primaryStage = Chess.primaryStage;
+            FXMLLoader mainMenu = new FXMLLoader(GameManager.class.getResource("/kyra/me/chess/scenes/main-menu.fxml"));
+            Scene scene = null;
+            try {
+            scene = mainMenu.load(); }
+            catch (IOException ex) { System.out.println(ex); }
+            primaryStage.setScene(scene);
+        }
+    }
+
+    public static void playAudio(){
+        if (lastMove == null) { return; }
+
+        if (lastMove.isCheck()) {
+            GameManager.audio[2].stop(); //resets the audio clip so it can be replayed
+            GameManager.audio[2].setFramePosition(0);
+            GameManager.audio[2].start();
+            return;
+        }
+        if (lastMove.isCapture()){
+            GameManager.audio[1].stop();
+            GameManager.audio[1].setFramePosition(0);
+            GameManager.audio[1].start();
+            return;
+        }
+        GameManager.audio[0].stop();
+        GameManager.audio[0].setFramePosition(0);
+        GameManager.audio[0].start();
     }
 }
