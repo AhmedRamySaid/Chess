@@ -42,7 +42,7 @@ public class Move {
         this.moveType = moveType;
 
         switch(this.moveType){
-            case normal:
+            case normal, promotion:
                 capturedPiece = end.getOccupyingPiece();
                 isCapture = capturedPiece != null;
                 break;
@@ -81,7 +81,7 @@ public class Move {
         GameManager.lastMove = this;
 
         switch(moveType) {
-            case enPassant:
+            case promotion:
                 movingPiece.destroy();
                 new Queen(endingSquare, !GameManager.isWhiteTurn);
                 break;

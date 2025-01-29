@@ -6,7 +6,10 @@ import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import kyra.me.chess.Chess;
 import kyra.me.chess.scripts.move.Move;
+import kyra.me.chess.scripts.move.MoveType;
 import kyra.me.chess.scripts.pieces.*;
+import kyra.me.chess.scripts.players.AI;
+import kyra.me.chess.scripts.players.Player;
 
 import javax.sound.sampled.*;
 import java.io.BufferedInputStream;
@@ -21,11 +24,16 @@ public class GameManager {
     public static Clip[] audio = new Clip[3];
     public static GameState gameState;
     public static Move lastMove;
+    public static Player playerOne;
+    public static Player playerTwo;
+    public static int turnCount; //used to decide if the game is a draw
 
     public static void gameStart(){
         gameState = GameState.normal;
         lastMove = null;
+        turnCount = 0;
         int col = 1, row = 8;
+
         for (int i = 0; i < FEN.length(); i++) {
             char c = FEN.charAt(i);
             switch (c) {
@@ -124,6 +132,12 @@ public class GameManager {
         turnStart();
     }
     public static void turnStart(){
+        if (lastMove != null) {
+            if (lastMove.isCapture() || lastMove.getMovingPiece() instanceof Pawn){
+                turnCount = 0;
+            } else { turnCount++; }
+        }
+
         Database.clearMoves();
         for (Piece piece: Database.getPieces()){ //move creation
             if (isWhiteTurn == piece.isWhite()){
@@ -136,6 +150,7 @@ public class GameManager {
         while (iterator.hasNext()){
             Move move = iterator.next();
 
+            if (move.getType() != MoveType.normal) { continue; }
             move.doMoveTemporary();
             for (Piece piece: Database.getPieces()){
                 if (isWhiteTurn == piece.isWhite()){
@@ -148,8 +163,20 @@ public class GameManager {
             move.undoMove();
             moves.clear();
         }
-        checkWinner();
         playAudio();
+        checkWinner();
+
+        if (gameState == GameState.normal){
+            if (isWhiteTurn){
+                if (playerOne instanceof AI) {
+                    ((AI)playerOne).generateMove().doMove();
+                }
+            } else {
+                if (playerTwo instanceof AI) {
+                    ((AI)playerTwo).generateMove().doMove();
+                }
+            }
+        }
     }
 
     public static void checkWinner(){
@@ -169,21 +196,28 @@ public class GameManager {
             }
             else { gameState = GameState.blackWon; }
 
-            Database.emptyAll();
-
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Game ended");
-            alert.setContentText(gameState.toString());
-            alert.showAndWait();
-
-            Stage primaryStage = Chess.primaryStage;
-            FXMLLoader mainMenu = new FXMLLoader(GameManager.class.getResource("/kyra/me/chess/scenes/main-menu.fxml"));
-            Scene scene = null;
-            try {
-            scene = mainMenu.load(); }
-            catch (IOException ex) { System.out.println(ex); }
-            primaryStage.setScene(scene);
         }
+        else if (turnCount >= 50){
+            gameState = GameState.draw;
+        }
+        else {
+            return;
+        }
+
+        Database.emptyAll();
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Game ended");
+        alert.setContentText(gameState.toString());
+        alert.showAndWait();
+
+        Stage primaryStage = Chess.primaryStage;
+        FXMLLoader mainMenu = new FXMLLoader(GameManager.class.getResource("/kyra/me/chess/scenes/main-menu.fxml"));
+        Scene scene = null;
+        try {
+            scene = mainMenu.load(); }
+        catch (IOException ex) { System.out.println(ex); }
+        primaryStage.setScene(scene);
     }
 
     public static void playAudio(){

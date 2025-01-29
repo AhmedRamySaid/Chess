@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import kyra.me.chess.scripts.pieces.Piece;
+import kyra.me.chess.scripts.players.Player;
 import kyra.me.chess.scripts.tile.Tile;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,6 +21,9 @@ public class Chess extends Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException {
+        //Creating profiles
+        Player.generateProfiles();
+
         Chess.primaryStage = primaryStage;
         primaryStage.show();
         primaryStage.setTitle("Chess");
