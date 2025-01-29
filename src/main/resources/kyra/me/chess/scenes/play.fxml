@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane style="-fx-background-color: #aed9e5;" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="kyra.me.chess.scripts.controllers.PlayController">
+   <left>
+      <ScrollPane fitToWidth="true" prefWidth="150">
+         <VBox fx:id="profileList1" spacing="10" style="-fx-padding: 10;" />
+      </ScrollPane>
+   </left>
+   <center>
+      <VBox alignment="CENTER" spacing="10" style="-fx-padding: 10; -fx-alignment: CENTER;">
+         <HBox alignment="CENTER" spacing="20" style="-fx-alignment: CENTER;">
+            <VBox alignment="CENTER" spacing="10">
+               <ImageView fx:id="selectedProfileImage1" fitHeight="100" fitWidth="100" />
+               <Label fx:id="selectedProfileName1" text="Select Player 1" />
+            </VBox>
+            <Button fx:id="startGameButton" onAction="#onStartButtonClicked" style="-fx-font-size: 1.5em;" text="Start Game" />
+            <VBox alignment="CENTER" spacing="10">
+               <ImageView fx:id="selectedProfileImage2" fitHeight="100" fitWidth="100" />
+               <Label fx:id="selectedProfileName2" text="Select Player 2" />
+            </VBox>
+         </HBox>
+      </VBox>
+   </center>
+   <right>
+      <ScrollPane fitToWidth="true" prefWidth="150">
+         <VBox fx:id="profileList2" spacing="10" style="-fx-padding: 10;" />
+      </ScrollPane>
+   </right>
+</BorderPane>
