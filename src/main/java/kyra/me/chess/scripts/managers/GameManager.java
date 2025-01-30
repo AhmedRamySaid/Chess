@@ -19,16 +19,26 @@ import java.util.Iterator;
 import java.util.List;
 
 public class GameManager {
-    public static String FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w";
-    public static boolean isWhiteTurn = true; //will change to true on start
-    public static Clip[] audio = new Clip[3];
-    public static GameState gameState;
-    public static Move lastMove;
     public static Player playerOne;
     public static Player playerTwo;
-    public static int turnCount; //used to decide if the game is a draw
 
-    public static void gameStart(){
+    public String FEN;
+    public boolean isWhiteTurn;
+    public Clip[] audio;
+    public GameState gameState;
+    public Move lastMove;
+    public int turnCount; //used to decide if the game is a draw because of the 50 move rule
+    public Database database;
+
+    public GameManager(){
+        FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w";
+        isWhiteTurn = true;
+        audio = new Clip[3];
+        database = new Database();
+        gameStart();
+    }
+
+    public void gameStart(){
         gameState = GameState.normal;
         lastMove = null;
         turnCount = 0;
@@ -38,51 +48,51 @@ public class GameManager {
             char c = FEN.charAt(i);
             switch (c) {
                 case 'r':
-                    new Rook(Database.getTile(col, row), false);
+                    new Rook(database.getTile(col, row), false);
                     col++;
                     break;
                 case 'R':
-                    new Rook(Database.getTile(col, row), true);
+                    new Rook(database.getTile(col, row), true);
                     col++;
                     break;
                 case 'n':
-                    new Knight(Database.getTile(col, row), false);
+                    new Knight(database.getTile(col, row), false);
                     col++;
                     break;
                 case 'N':
-                    new Knight(Database.getTile(col, row), true);
+                    new Knight(database.getTile(col, row), true);
                     col++;
                     break;
                 case 'b':
-                    new Bishop(Database.getTile(col, row), false);
+                    new Bishop(database.getTile(col, row), false);
                     col++;
                     break;
                 case 'B':
-                    new Bishop(Database.getTile(col, row), true);
+                    new Bishop(database.getTile(col, row), true);
                     col++;
                     break;
                 case 'q':
-                    new Queen(Database.getTile(col, row), false);
+                    new Queen(database.getTile(col, row), false);
                     col++;
                     break;
                 case 'Q':
-                    new Queen(Database.getTile(col, row), true);
+                    new Queen(database.getTile(col, row), true);
                     col++;
                     break;
                 case 'k':
-                    new King(Database.getTile(col, row), false);
+                    new King(database.getTile(col, row), false);
                     col++;
                     break;
                 case 'K':
-                    new King(Database.getTile(col, row), true);
+                    new King(database.getTile(col, row), true);
                     col++;
                     break;
                 case 'p':
-                    new Pawn(Database.getTile(col, row), false);
+                    new Pawn(database.getTile(col, row), false);
                     col++;
                     break;
                 case 'P':
-                    new Pawn(Database.getTile(col, row), true);
+                    new Pawn(database.getTile(col, row), true);
                     col++;
                     break;
                 case '/':
@@ -131,28 +141,28 @@ public class GameManager {
         catch (UnsupportedAudioFileException | LineUnavailableException | IOException ex) {System.out.println(ex);}
         turnStart();
     }
-    public static void turnStart(){
+    public void turnStart(){
         if (lastMove != null) {
             if (lastMove.isCapture() || lastMove.getMovingPiece() instanceof Pawn){
                 turnCount = 0;
             } else { turnCount++; }
         }
 
-        Database.clearMoves();
-        for (Piece piece: Database.getPieces()){ //move creation
+        database.clearMoves();
+        for (Piece piece: database.getPieces()){ //move creation
             if (isWhiteTurn == piece.isWhite()){
-                piece.createMoves(Database.getMoves());
+                piece.createMoves(database.getMoves());
             }
         }
 
         List<Move> moves = new ArrayList<>(); //move validation
-        Iterator<Move> iterator = Database.getMoves().iterator();
+        Iterator<Move> iterator = database.getMoves().iterator();
         while (iterator.hasNext()){
             Move move = iterator.next();
 
             if (move.getType() != MoveType.normal) { continue; }
             move.doMoveTemporary();
-            for (Piece piece: Database.getPieces()){
+            for (Piece piece: database.getPieces()){
                 if (isWhiteTurn == piece.isWhite()){
                     piece.createMoves(moves);
                 }
@@ -179,12 +189,12 @@ public class GameManager {
         }
     }
 
-    public static void checkWinner(){
-        if (Database.getMoves().isEmpty()){
+    public void checkWinner(){
+        if (database.getMoves().isEmpty()){
             isWhiteTurn = !isWhiteTurn;
-            for (Piece piece: Database.getPieces()){
+            for (Piece piece: database.getPieces()){
                 if (isWhiteTurn == piece.isWhite()){
-                    piece.createMoves(Database.getMoves());
+                    piece.createMoves(database.getMoves());
                 }
             }
 
@@ -204,7 +214,7 @@ public class GameManager {
             return;
         }
 
-        Database.emptyAll();
+        database.emptyAll();
 
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Game ended");
@@ -220,23 +230,23 @@ public class GameManager {
         primaryStage.setScene(scene);
     }
 
-    public static void playAudio(){
+    public void playAudio(){
         if (lastMove == null) { return; }
 
         if (lastMove.isCheck()) {
-            GameManager.audio[2].stop(); //resets the audio clip so it can be replayed
-            GameManager.audio[2].setFramePosition(0);
-            GameManager.audio[2].start();
+            audio[2].stop(); //resets the audio clip so it can be replayed
+            audio[2].setFramePosition(0);
+            audio[2].start();
             return;
         }
         if (lastMove.isCapture()){
-            GameManager.audio[1].stop();
-            GameManager.audio[1].setFramePosition(0);
-            GameManager.audio[1].start();
+            audio[1].stop();
+            audio[1].setFramePosition(0);
+            audio[1].start();
             return;
         }
-        GameManager.audio[0].stop();
-        GameManager.audio[0].setFramePosition(0);
-        GameManager.audio[0].start();
+        audio[0].stop();
+        audio[0].setFramePosition(0);
+        audio[0].start();
     }
 }
