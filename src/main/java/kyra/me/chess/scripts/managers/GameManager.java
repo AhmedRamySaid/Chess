@@ -150,7 +150,7 @@ public class GameManager {
         while (iterator.hasNext()){
             Move move = iterator.next();
 
-            if (move.getType() != MoveType.normal) { continue; }
+            if (false) { continue; }
             move.doMoveTemporary();
             for (Piece piece: Database.getPieces()){
                 if (isWhiteTurn == piece.isWhite()){
