@@ -2,6 +2,7 @@ package kyra.me.chess.scripts.pieces;
 
 import kyra.me.chess.scripts.managers.Database;
 import kyra.me.chess.scripts.move.Move;
+import kyra.me.chess.scripts.move.NormalMove;
 import kyra.me.chess.scripts.tile.Tile;
 
 import java.util.List;
@@ -15,12 +16,14 @@ public interface DiagonalMovingPiece {
             Tile t = Database.getTile(x, y);
             if (t.getOccupyingPiece() != null){
                 if (t.getOccupyingPiece().isWhite() != piece.isWhite()) {
-                    piece.addMove(moves, t);
+                    Move move = new NormalMove(piece.occupiedTile, t);
+                    moves.add(move);
                 }
                 return;
             }
 
-            piece.addMove(moves, t);
+            Move move = new NormalMove(piece.occupiedTile, t);
+            moves.add(move);
             x += xDirection;
             y += yDirection;
         }

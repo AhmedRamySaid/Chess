@@ -2,11 +2,15 @@ package kyra.me.chess.scripts.pieces;
 
 import kyra.me.chess.scripts.managers.Database;
 import kyra.me.chess.scripts.move.Move;
+import kyra.me.chess.scripts.move.NormalMove;
 import kyra.me.chess.scripts.tile.Tile;
 
 import java.util.List;
 
 public class Knight extends Piece {
+    public Knight(boolean isWhite) {
+        this(null, isWhite);
+    }
     public Knight(Tile tile, boolean isWhite){
         super(tile, isWhite);
         if (isWhite) {
@@ -34,5 +38,16 @@ public class Knight extends Piece {
                 values[1] = -values[1];  // Toggle the second value
             }
         }
+    }
+
+    private void addMove(List<Move> moves, Tile endTile){
+        if (endTile == null) { return; }
+        if (endTile.getOccupyingPiece() != null) {
+            if (endTile.getOccupyingPiece().isWhite() == isWhite()) {
+                return;
+            }
+        }
+        Move move = new NormalMove(occupiedTile, endTile);
+        moves.add(move);
     }
 }

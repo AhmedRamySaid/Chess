@@ -6,10 +6,14 @@ import kyra.me.chess.scripts.tile.Tile;
 import java.util.List;
 
 public class Rook extends Piece implements DiagonalMovingPiece{
+    public Rook(boolean isWhite){
+        this(null, isWhite);
+    }
     public Rook(Tile tile, boolean isWhite) {
         super(tile, isWhite);
         if (isWhite()){
             this.setImage(models[6]);
+            if (tile == null) { hasMoved = true; return; }
             if (occupiedTile.getYPosition() == 8){
                 if (occupiedTile.getXPosition() == 1 || occupiedTile.getXPosition() == 8){
                     hasMoved = true;
@@ -18,6 +22,7 @@ public class Rook extends Piece implements DiagonalMovingPiece{
             }
         } else {
             this.setImage(models[7]);
+            if (tile == null) { hasMoved = true; return; }
             if (occupiedTile.getYPosition() == 1){
                 if (occupiedTile.getXPosition() == 1 || occupiedTile.getXPosition() == 8){
                     hasMoved = true;

@@ -6,7 +6,10 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import kyra.me.chess.scripts.managers.Database;
+import kyra.me.chess.scripts.managers.GameManager;
 import kyra.me.chess.scripts.move.Move;
+import kyra.me.chess.scripts.move.PromotingMove;
+import kyra.me.chess.scripts.players.HumanPlayer;
 import kyra.me.chess.scripts.tile.Tile;
 
 import java.util.List;
@@ -24,6 +27,40 @@ public abstract class Piece extends ImageView {
         this.isWhite = isWhite;
         this.setPreserveRatio(true);
         this.setFitHeight(40);
+        occupiedTile = tile;
+
+        if (occupiedTile != null){
+            initialize(occupiedTile);
+        }
+    }
+
+    public void moveTo(Tile newTile){
+        Move move = Database.getMoves().stream().filter(t -> t.getMovingPiece() == this &&
+                t.getEndingSquare().equals(newTile)).findFirst().orElse(null);
+        if (move == null) {
+            return;
+        }
+
+        if (GameManager.playerOne instanceof HumanPlayer && GameManager.isWhiteTurn ||
+                GameManager.playerTwo instanceof HumanPlayer && !GameManager.isWhiteTurn){
+            if (move instanceof PromotingMove){
+                ((PromotingMove)move).showSelection();
+                return;
+            }
+        }
+
+        move.doMove();
+    }
+
+    abstract public void createMoves(List<Move> moves);
+
+    public void destroy() {
+        Database.removePiece(this);
+        occupiedTile.setOccupyingPiece(null);
+        getStackPane().getChildren().remove(this);
+    }
+
+    public void initialize(Tile tile){
         occupiedTile = tile;
         tile.getStackPane().getChildren().add(this);
 
@@ -44,36 +81,6 @@ public abstract class Piece extends ImageView {
 
         this.fitWidthProperty().bind(getStackPane().prefWidthProperty());
         this.fitHeightProperty().bind(getStackPane().prefHeightProperty());
-    }
-
-    public void moveTo(Tile newTile){
-        Move move = Database.getMoves().stream().filter(t -> t.getMovingPiece() == this &&
-                t.getEndingSquare().equals(newTile)).findFirst().orElse(null);
-        if (move == null) {
-            return;
-        }
-        move.doMove();
-    }
-
-    abstract public void createMoves(List<Move> moves);
-
-    public void destroy() {
-        Database.removePiece(this);
-        occupiedTile.setOccupyingPiece(null);
-        getStackPane().getChildren().remove(this);
-    }
-
-    //to prevent the method from changing the list when validating legal moves
-    //validation is done to remove moves that puts the king in check
-    public void addMove(List<Move> moves, Tile endTile){
-        if (endTile == null) { return; }
-        if (endTile.getOccupyingPiece() != null) {
-            if (endTile.getOccupyingPiece().isWhite() == isWhite()) {
-                return;
-            }
-        }
-        Move move = new Move(occupiedTile, endTile);
-        moves.add(move);
     }
 
     public List<Move> getMoves() { return Database.getMoves().stream().filter(t -> t.getMovingPiece() == this).collect(Collectors.toList()); }

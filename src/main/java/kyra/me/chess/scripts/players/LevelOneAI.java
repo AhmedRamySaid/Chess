@@ -2,6 +2,8 @@ package kyra.me.chess.scripts.players;
 
 import kyra.me.chess.scripts.managers.Database;
 import kyra.me.chess.scripts.move.Move;
+import kyra.me.chess.scripts.pieces.Rook;
+import kyra.me.chess.scripts.tile.Tile;
 
 import java.util.Random;
 

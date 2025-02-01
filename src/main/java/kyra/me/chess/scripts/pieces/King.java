@@ -1,8 +1,10 @@
 package kyra.me.chess.scripts.pieces;
 
 import kyra.me.chess.scripts.managers.Database;
+import kyra.me.chess.scripts.move.CastlingMove;
 import kyra.me.chess.scripts.move.Move;
 import kyra.me.chess.scripts.move.MoveType;
+import kyra.me.chess.scripts.move.NormalMove;
 import kyra.me.chess.scripts.tile.Tile;
 
 import java.util.List;
@@ -35,11 +37,11 @@ public class King extends Piece {
                 if (t == null) { continue; }
                 if (t.getOccupyingPiece() != null) {
                     if (t.getOccupyingPiece().isWhite() != isWhite()) {
-                        Move move = new Move(occupiedTile, t);
+                        Move move = new NormalMove(occupiedTile, t);
                         moves.add(move);
                     }
                 } else {
-                    Move move = new Move(occupiedTile, t);
+                    Move move = new NormalMove(occupiedTile, t);
                     moves.add(move);
                 }
             }
@@ -53,8 +55,8 @@ public class King extends Piece {
             while (x >= 1){
                 t = Database.getTile(x, getOccupiedTile().getYPosition());
                 if (x == 1 && t.getOccupyingPiece() instanceof Rook && t.getOccupyingPiece().isWhite() == isWhite() && !t.getOccupyingPiece().hasMoved) {
-                    Move move = new Move(occupiedTile, Database.getTile(3, getOccupiedTile().getYPosition()), MoveType.castling,
-                            (Rook)t.getOccupyingPiece(), Database.getTile(4, getOccupiedTile().getYPosition()));
+                    Move move = new CastlingMove( occupiedTile, Database.getTile(3, getOccupiedTile().getYPosition()),
+                            (Rook)t.getOccupyingPiece(), Database.getTile(4, getOccupiedTile().getYPosition()) );
                     moves.add(move);
                 }
                 if (t.getOccupyingPiece() != null){
@@ -68,8 +70,8 @@ public class King extends Piece {
             while (x <= 8){
                 t = Database.getTile(x, getOccupiedTile().getYPosition());
                 if (x == 8 && t.getOccupyingPiece() instanceof Rook && t.getOccupyingPiece().isWhite() == isWhite() && !t.getOccupyingPiece().hasMoved) {
-                    Move move = new Move(occupiedTile, Database.getTile(7, getOccupiedTile().getYPosition()), MoveType.castling,
-                            (Rook)t.getOccupyingPiece(), Database.getTile(6, getOccupiedTile().getYPosition()));
+                    Move move = new CastlingMove( occupiedTile, Database.getTile(7, getOccupiedTile().getYPosition()),
+                            (Rook)t.getOccupyingPiece(), Database.getTile(6, getOccupiedTile().getYPosition()) );
                     moves.add(move);
                 }
                 if (t.getOccupyingPiece() != null){

@@ -6,6 +6,9 @@ import kyra.me.chess.scripts.tile.Tile;
 import java.util.List;
 
 public class Queen extends Piece implements DiagonalMovingPiece{
+    public Queen(boolean isWhite){
+        this(null, isWhite);
+    }
     public Queen(Tile tile, boolean isWhite) {
         super(tile, isWhite);
         if (isWhite()){

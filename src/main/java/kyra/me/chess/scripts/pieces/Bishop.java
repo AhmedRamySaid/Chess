@@ -6,6 +6,9 @@ import kyra.me.chess.scripts.tile.Tile;
 import java.util.List;
 
 public class Bishop extends Piece implements DiagonalMovingPiece{
+    public Bishop(boolean isWhite) {
+        this(null, isWhite);
+    }
     public Bishop(Tile tile, boolean isWhite) {
         super(tile, isWhite);
         if (isWhite()){

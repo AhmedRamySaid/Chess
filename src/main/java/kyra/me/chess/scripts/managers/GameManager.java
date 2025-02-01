@@ -133,9 +133,11 @@ public class GameManager {
     }
     public static void turnStart(){
         if (lastMove != null) {
+            isWhiteTurn = !isWhiteTurn;
             if (lastMove.isCapture() || lastMove.getMovingPiece() instanceof Pawn){
                 turnCount = 0;
-            } else { turnCount++; }
+            }
+            else { turnCount++; }
         }
 
         Database.clearMoves();
@@ -150,7 +152,6 @@ public class GameManager {
         while (iterator.hasNext()){
             Move move = iterator.next();
 
-            if (false) { continue; }
             move.doMoveTemporary();
             for (Piece piece: Database.getPieces()){
                 if (isWhiteTurn == piece.isWhite()){
