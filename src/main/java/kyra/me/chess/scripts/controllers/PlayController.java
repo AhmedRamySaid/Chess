@@ -7,10 +7,8 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import kyra.me.chess.Chess;
 import kyra.me.chess.scripts.managers.Database;
@@ -84,6 +82,7 @@ public class PlayController {
 
         // Create the GridPane for the chessboard
         GridPane gridPane = new GridPane();
+        Chess.board = gridPane;
         gridPane.setAlignment(Pos.CENTER);
 
         // Create the StackPane to hold the grid
@@ -107,6 +106,7 @@ public class PlayController {
 
         // Create a VBox to hold the profile info for Player 1 and Player 2
         VBox profileBox = createProfileBox(GameManager.playerOne, GameManager.playerTwo);
+        Chess.playersProfiles = profileBox;
         profileBox.spacingProperty().bind(binding.divide(2));
 
         // Create a BorderPane to arrange the grid and the profiles side by side

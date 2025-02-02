@@ -1,14 +1,16 @@
 package kyra.me.chess.scripts.managers;
 
+import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import kyra.me.chess.Chess;
 import kyra.me.chess.scripts.move.Move;
-import kyra.me.chess.scripts.move.MoveType;
 import kyra.me.chess.scripts.pieces.*;
 import kyra.me.chess.scripts.players.AI;
+import kyra.me.chess.scripts.players.HumanPlayer;
 import kyra.me.chess.scripts.players.Player;
 
 import javax.sound.sampled.*;
@@ -132,9 +134,11 @@ public class GameManager {
             audio[2] = checkClip;
         }
         catch (UnsupportedAudioFileException | LineUnavailableException | IOException ex) {System.out.println(ex);}
-        turnStart();
 
-        System.out.println(moveGeneration(5,5));
+        if (playerOne instanceof AI && playerTwo instanceof HumanPlayer) {
+            Chess.playersProfiles.getChildren().getFirst().toFront();
+        }
+        turnStart();
     }
     public static void turnStart(){
         if (lastMove != null) {
@@ -143,6 +147,9 @@ public class GameManager {
                 turnCount = 0;
             }
             else { turnCount++; }
+            if (playerOne instanceof HumanPlayer && playerTwo instanceof HumanPlayer) {
+                Chess.playersProfiles.getChildren().getFirst().toFront();
+            }
         }
 
         Database.clearMoves();
@@ -156,15 +163,27 @@ public class GameManager {
         playAudio();
         checkWinner();
 
-        if (gameState == GameState.normal){
-            if (isWhiteTurn){
-                if (playerOne instanceof AI) {
-                    ((AI)playerOne).generateMove().doMove();
-                }
-            } else {
-                if (playerTwo instanceof AI) {
-                    ((AI)playerTwo).generateMove().doMove();
-                }
+        if (gameState != GameState.normal) { return; }
+        if (isWhiteTurn){
+            if (playerOne instanceof AI) {
+                ((AI)playerOne).generateMove().doMove();
+                return;
+            }
+            Chess.board.setRotate(0);
+            for (Node node: Chess.board.getChildren()){
+                node.setRotate(0);
+                //if the game just started they are in the correct position
+            }
+        }
+        else
+        {
+            if (playerTwo instanceof AI) {
+                ((AI)playerTwo).generateMove().doMove();
+                return;
+            }
+            Chess.board.setRotate(180);
+            for (Node node: Chess.board.getChildren()){
+                node.setRotate(-180);
             }
         }
     }

@@ -3,6 +3,8 @@ package kyra.me.chess;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import kyra.me.chess.scripts.pieces.Piece;
@@ -18,6 +20,8 @@ public class Chess extends Application {
     Color tileMainColor =Color.LIGHTGRAY;
     Color tileOffsetColor = Color.BROWN;
     public static Stage primaryStage;
+    public static GridPane board;
+    public static VBox playersProfiles;
 
     @Override
     public void start(Stage primaryStage) throws IOException {
