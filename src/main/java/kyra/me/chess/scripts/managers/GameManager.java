@@ -36,6 +36,9 @@ public class GameManager {
 
         for (int i = 0; i < FEN.length(); i++) {
             char c = FEN.charAt(i);
+            if (col == 2 && row == 6){
+                System.out.print("");
+            }
             switch (c) {
                 case 'r':
                     new Rook(Database.getTile(col, row), false);
@@ -130,6 +133,8 @@ public class GameManager {
         }
         catch (UnsupportedAudioFileException | LineUnavailableException | IOException ex) {System.out.println(ex);}
         turnStart();
+
+        System.out.println(moveGeneration(5,5));
     }
     public static void turnStart(){
         if (lastMove != null) {
@@ -147,23 +152,7 @@ public class GameManager {
             }
         }
 
-        List<Move> moves = new ArrayList<>(); //move validation
-        Iterator<Move> iterator = Database.getMoves().iterator();
-        while (iterator.hasNext()){
-            Move move = iterator.next();
-
-            move.doMoveTemporary();
-            for (Piece piece: Database.getPieces()){
-                if (isWhiteTurn == piece.isWhite()){
-                    piece.createMoves(moves);
-                }
-            }
-            moves.stream().filter(t -> t.getCapturedPiece() instanceof King).findAny().ifPresentOrElse(
-                    badMove -> iterator.remove(), move::initializeIsCheck
-            );
-            move.undoMove();
-            moves.clear();
-        }
+        moveCreation(Database.getMoves());
         playAudio();
         checkWinner();
 
@@ -239,5 +228,53 @@ public class GameManager {
         GameManager.audio[0].stop();
         GameManager.audio[0].setFramePosition(0);
         GameManager.audio[0].start();
+    }
+
+    public static void moveCreation(List<Move> moves){
+        for (Piece piece: Database.getPieces()){ //move creation
+            if (isWhiteTurn == piece.isWhite()){
+                piece.createMoves(moves);
+            }
+        }
+
+        List<Move> m = new ArrayList<>(); //move validation
+        Iterator<Move> iterator = moves.iterator();
+        while (iterator.hasNext()){
+            Move move = iterator.next();
+
+            move.doMoveTemporary();
+            for (Piece piece: Database.getPieces()){
+                if (isWhiteTurn == piece.isWhite()){
+                    piece.createMoves(m);
+                }
+            }
+            m.stream().filter(t -> t.getCapturedPiece() instanceof King).findAny().ifPresentOrElse(
+                    badMove -> iterator.remove(), move::initializeIsCheck
+            );
+            move.undoMove();
+            m.clear();
+        }
+    }
+
+    public static int moveGeneration(int depth, int og){
+        if (depth == 0){
+            return 1;
+        }
+        int numOfPositions = 0;
+        List<Move> moves = new ArrayList<>();
+        moveCreation(moves);
+
+        for (Move move : moves){
+            move.doMoveTemporary();
+            int n = moveGeneration(depth - 1, og);
+            if ( depth == og) {
+                char c1 = (char)(move.getStartingSquare().getXPosition() + 'a' - 1);
+                char c2 = (char)(move.getEndingSquare().getXPosition() + 'a' - 1);
+                System.out.println( c1 + "" + move.getStartingSquare().getYPosition() + c2 + move.getEndingSquare().getYPosition() + ": " + n);
+            }
+            numOfPositions += n;
+            move.undoMove();
+        }
+        return numOfPositions;
     }
 }

@@ -4,8 +4,6 @@ import kyra.me.chess.scripts.managers.Database;
 import kyra.me.chess.scripts.managers.GameManager;
 import kyra.me.chess.scripts.pieces.King;
 import kyra.me.chess.scripts.pieces.Piece;
-import kyra.me.chess.scripts.pieces.Queen;
-import kyra.me.chess.scripts.pieces.Rook;
 import kyra.me.chess.scripts.tile.Tile;
 
 import java.util.ArrayList;
@@ -71,6 +69,7 @@ public abstract class Move {
 
         this.movingPieceHasMoved = movingPiece.getHasMoved();
         this.lastMove = GameManager.lastMove;
+        GameManager.lastMove = this;
 
         movingPiece.setHasMoved(true);
         startingSquare.setOccupyingPiece(null);
@@ -91,6 +90,13 @@ public abstract class Move {
         endingSquare.setOccupyingPiece(capturedPiece);
         movingPiece.setOccupiedTile(startingSquare);
 
+        if (moveType == MoveType.enPassant){
+            endingSquare.setOccupyingPiece(null);
+            int color = movingPiece.isWhite()? 1: -1; //if white, the pawn goes up. if black, the pawn goes down
+            Tile t = Database.getTile(endingSquare.getXPosition(), endingSquare.getYPosition() + color);
+            t.setOccupyingPiece(capturedPiece);
+            capturedPiece.setOccupiedTile(t);
+        }
         GameManager.isWhiteTurn = !GameManager.isWhiteTurn;
     }
     public void initializeIsCheck(){
