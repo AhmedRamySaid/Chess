@@ -185,7 +185,7 @@ public class PlayController {
         //Create a Timeline to update the timer every second
         Timeline timeline = new Timeline();
         KeyFrame keyFrame = new KeyFrame(Duration.seconds(1), event -> {
-            if (playerIsWhite == GameManager.isWhiteTurn) {
+            if (playerIsWhite == GameManager.isWhiteTurnTemp) {
                 // Decrease the remaining duration by 1 second
                 remainingDuration[0] = remainingDuration[0].subtract(Duration.seconds(1));
 
