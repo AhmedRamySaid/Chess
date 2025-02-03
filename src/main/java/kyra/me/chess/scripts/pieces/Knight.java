@@ -22,6 +22,7 @@ public class Knight extends Piece {
 
     @Override
     public void createMoves(List<Move> moves){
+        if (occupiedTile.isUnderPin()) return;
         int[] values = {1, 2};
 
         // Iterate through {1, 2}, {-1, 2}, {1, -2}, {-1, -2}

@@ -122,6 +122,7 @@ public class Tile extends Rectangle {
     public Piece getOccupyingPiece() { return occupyingPiece; }
     public StackPane getStackPane() { return (StackPane)getParent(); }
     public boolean isUnderAttack() { return isUnderAttack; }
+    public boolean isUnderPin() { return isUnderPin; }
     public int getXPosition(){ return xPosition; }
     public int getYPosition(){ return yPosition; }
 }

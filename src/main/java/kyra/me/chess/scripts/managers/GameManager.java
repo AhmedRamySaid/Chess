@@ -39,9 +39,7 @@ public class GameManager {
 
         for (int i = 0; i < FEN.length(); i++) {
             char c = FEN.charAt(i);
-            if (col == 2 && row == 6){
-                System.out.print("");
-            }
+
             switch (c) {
                 case 'r':
                     new Rook(Database.getTile(col, row), false);
