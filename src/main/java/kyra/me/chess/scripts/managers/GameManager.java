@@ -1,6 +1,5 @@
 package kyra.me.chess.scripts.managers;
 
-import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -136,7 +135,7 @@ public class GameManager {
         catch (UnsupportedAudioFileException | LineUnavailableException | IOException ex) {System.out.println(ex);}
 
         if (playerOne instanceof AI && playerTwo instanceof HumanPlayer) {
-            Chess.playersProfiles.getChildren().getFirst().toFront();
+            rotateProfilesAndTimer();
         }
         turnStart();
     }
@@ -148,7 +147,7 @@ public class GameManager {
             }
             else { turnCount++; }
             if (playerOne instanceof HumanPlayer && playerTwo instanceof HumanPlayer) {
-                Chess.playersProfiles.getChildren().getFirst().toFront();
+                rotateProfilesAndTimer();
             }
         }
 
@@ -169,10 +168,10 @@ public class GameManager {
                 ((AI)playerOne).generateMove().doMove();
                 return;
             }
+
             Chess.board.setRotate(0);
             for (Node node: Chess.board.getChildren()){
                 node.setRotate(0);
-                //if the game just started they are in the correct position
             }
         }
         else
@@ -181,6 +180,7 @@ public class GameManager {
                 ((AI)playerTwo).generateMove().doMove();
                 return;
             }
+
             Chess.board.setRotate(180);
             for (Node node: Chess.board.getChildren()){
                 node.setRotate(-180);
@@ -214,19 +214,24 @@ public class GameManager {
         }
 
         Database.emptyAll();
+        endGame();
+    }
 
+    public static void endGame(){
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Game ended");
         alert.setContentText(gameState.toString());
-        alert.showAndWait();
+        alert.show();
 
-        Stage primaryStage = Chess.primaryStage;
-        FXMLLoader mainMenu = new FXMLLoader(GameManager.class.getResource("/kyra/me/chess/scenes/main-menu.fxml"));
-        Scene scene = null;
-        try {
-            scene = mainMenu.load(); }
-        catch (IOException ex) { System.out.println(ex); }
-        primaryStage.setScene(scene);
+        alert.setOnHidden(event -> {
+            Stage primaryStage = Chess.primaryStage;
+            FXMLLoader mainMenu = new FXMLLoader(GameManager.class.getResource("/kyra/me/chess/scenes/main-menu.fxml"));
+            Scene scene = null;
+            try {
+                scene = mainMenu.load(); }
+            catch (IOException ex) { System.out.println(ex); }
+            primaryStage.setScene(scene);
+        });
     }
 
     public static void playAudio(){
@@ -295,5 +300,12 @@ public class GameManager {
             move.undoMove();
         }
         return numOfPositions;
+    }
+
+    private static void rotateProfilesAndTimer(){
+        Chess.playersProfiles.getChildren().getFirst().toFront();
+
+        Chess.sceneVBox.getChildren().getFirst().toFront();
+        Chess.sceneVBox.getChildren().get(1).toBack();
     }
 }

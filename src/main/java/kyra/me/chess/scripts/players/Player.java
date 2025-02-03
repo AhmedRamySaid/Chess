@@ -21,6 +21,7 @@ public abstract class Player {
 
     public static void generateProfiles(){
         new HumanPlayer("/kyra/me/chess/assets/models/colette.jpg", "Colette");
+        new HumanPlayer("/kyra/me/chess/assets/models/ganyu.jpg", "test");
         new LevelOneAI("/kyra/me/chess/assets/models/ganyu.jpg", "Ganyu (bot)");
     }
 

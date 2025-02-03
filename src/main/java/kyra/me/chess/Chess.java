@@ -21,6 +21,7 @@ public class Chess extends Application {
     Color tileOffsetColor = Color.BROWN;
     public static Stage primaryStage;
     public static GridPane board;
+    public static VBox sceneVBox;
     public static VBox playersProfiles;
 
     @Override
