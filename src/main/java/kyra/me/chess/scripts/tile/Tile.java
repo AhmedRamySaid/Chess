@@ -15,6 +15,8 @@ public class Tile extends Rectangle {
     private Piece occupyingPiece;
     private Circle playableMove;
     private boolean isUnderAttack;
+    private boolean isUnderPin;
+    private boolean isUnderCheck;
 
     public Tile(int x, int y, StackPane pane) {
         pane.getChildren().add(this);
@@ -81,13 +83,21 @@ public class Tile extends Rectangle {
     }
 
     public void toggleUnderAttackOn(boolean isWhite){
-        if (occupyingPiece != null) {
-            if (occupyingPiece.isWhite() == isWhite) { return; }
-        }
         isUnderAttack = true;
     }
-    public void toggleUnderAttackOff(){
+    public void toggleUnderPinOn(){
+        isUnderPin = true;
+        //setColor(Color.ORANGE, Color.ORANGE);
+    }
+    public void toggleUnderCheckOn(){
+        isUnderCheck = true;
+        //setColor(Color.RED, Color.RED);
+    }
+    public void toggleAllOff(){
         isUnderAttack = false;
+        isUnderPin = false;
+        isUnderCheck = false;
+        //setColor(Color.WHITE, Color.SADDLEBROWN);
     }
 
     public void setColor(Color mainColor, Color offsetColor) {

@@ -22,7 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class GameManager {
-    public static String FEN = "rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w";
+    public static String FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w";
     public static boolean isWhiteTurn = true; //will change to true on start
     public static Clip[] audio = new Clip[3];
     public static GameState gameState;
@@ -141,7 +141,7 @@ public class GameManager {
         }
         turnStart();
 
-        moveGeneration(5);
+        //moveGeneration(5);
     }
     public static void turnStart(){
         if (lastMove != null) {
@@ -255,7 +255,8 @@ public class GameManager {
     public static void moveCreation(List<Move> moveList){
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
-                Database.getTile(i,j).toggleUnderAttackOff();
+                Tile t = Database.getTile(i,j);
+                t.toggleAllOff();
             }
         }
         for (Piece piece: Database.getPieces()){
@@ -267,46 +268,6 @@ public class GameManager {
             if (isWhiteTurn == piece.isWhite()){
                 piece.createMoves(moveList);
             }
-        }
-
-        List<Move> m = new ArrayList<>(); //move validation
-        Iterator<Move> iterator = moveList.iterator();
-        while (iterator.hasNext()){
-            Move move = iterator.next();
-
-            move.doMoveTemporary();
-            Piece king = null;
-
-            for (int i = 1; i <= 8; i++) {
-                for (int j = 1; j <= 8; j++) {
-                    Database.getTile(i,j).toggleUnderAttackOff();
-                }
-            }
-            for (Piece piece: Database.getPieces()){
-                if (isWhiteTurn != piece.isWhite()){
-                    piece.createAttacks();
-                }
-            }
-
-            for (Piece piece: Database.getPieces()){
-                if (isWhiteTurn == piece.isWhite()){
-                    piece.createMoves(m);
-                }
-                if (piece instanceof King && piece.isWhite() == isWhiteTurn){
-                    king = piece;
-                }
-            }
-            try {
-                if (king.getOccupiedTile().isUnderAttack()) {
-                    move.setIsCheck(true); }
-            } catch (RuntimeException e) {
-                endGame();
-            }
-            m.stream().filter(t -> t.getCapturedPiece() instanceof King).findAny().ifPresent(
-                    badMove -> iterator.remove());
-            move.undoMove();
-
-            m.clear();
         }
     }
 

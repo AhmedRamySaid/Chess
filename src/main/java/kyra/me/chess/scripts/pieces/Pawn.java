@@ -82,16 +82,12 @@ public class Pawn extends Piece {
 
         t = Database.getTile(occupiedTile.getXPosition()+1, occupiedTile.getYPosition() + color);
         if (t != null) {
-            if (t.getOccupyingPiece() != null) {
-                t.toggleUnderAttackOn(isWhite);
-            }
+            t.toggleUnderAttackOn(isWhite);
         }
 
         t = Database.getTile(occupiedTile.getXPosition()-1, occupiedTile.getYPosition() + color);
         if (t != null) {
-            if (t.getOccupyingPiece() != null) {
-                t.toggleUnderAttackOn(isWhite);
-            }
+            t.toggleUnderAttackOn(isWhite);
         }
     }
 
