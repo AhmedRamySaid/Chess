@@ -25,6 +25,8 @@ public class Pawn extends Piece {
     }
     @Override
     public void createMoves(List<Move> moves){
+        if (GameManager.isDoubleCheck) return;
+
         int color = isWhite? 1: -1; //if white, the pawn goes up. if black, the pawn goes down
 
         Tile t = Database.getTile(occupiedTile.getXPosition(), occupiedTile.getYPosition() + color);

@@ -1,5 +1,6 @@
 package kyra.me.chess.scripts.pieces;
 
+import kyra.me.chess.scripts.managers.GameManager;
 import kyra.me.chess.scripts.move.Move;
 import kyra.me.chess.scripts.tile.Tile;
 
@@ -35,6 +36,8 @@ public class Rook extends Piece implements DiagonalMovingPiece{
 
     @Override
     public void createMoves(List<Move> moves) {
+        if (GameManager.isDoubleCheck) return;
+
         createDiagonalMove(moves, 0, 1);
         createDiagonalMove(moves, 0, -1);
         createDiagonalMove(moves, 1, 0);

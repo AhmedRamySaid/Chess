@@ -1,6 +1,7 @@
 package kyra.me.chess.scripts.pieces;
 
 import kyra.me.chess.scripts.managers.Database;
+import kyra.me.chess.scripts.managers.GameManager;
 import kyra.me.chess.scripts.move.Move;
 import kyra.me.chess.scripts.move.NormalMove;
 import kyra.me.chess.scripts.tile.Tile;
@@ -22,6 +23,8 @@ public class Knight extends Piece {
 
     @Override
     public void createMoves(List<Move> moves){
+        if (GameManager.isDoubleCheck) return;
+
         if (occupiedTile.isUnderPin()) return;
         int[] values = {1, 2};
 

@@ -49,9 +49,7 @@ public interface DiagonalMovingPiece {
 
         int x = piece.getOccupiedTile().getXPosition() + xDirection;
         int y = piece.getOccupiedTile().getYPosition() + yDirection;
-        if (piece instanceof Queen && xDirection == 1 && yDirection == -1){
-            System.out.println();
-        }
+
         while (x >= 1 && x <=8 && y >= 1 && y <=8){
             tile = Database.getTile(x, y);
 
@@ -79,7 +77,11 @@ public interface DiagonalMovingPiece {
             y += yDirection;
         }
 
-        if (isCheck) piece.getOccupiedTile().toggleUnderCheckOn();
+        if (isCheck) {
+            piece.getOccupiedTile().toggleUnderCheckOn();
+            GameManager.isDoubleCheck = GameManager.isCheck;
+            GameManager.isCheck = true;
+        }
         if (isPin) piece.getOccupiedTile().toggleUnderPinOn();
         x = piece.getOccupiedTile().getXPosition() + xDirection;
         y = piece.getOccupiedTile().getYPosition() + yDirection;

@@ -7,7 +7,6 @@ import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import kyra.me.chess.Chess;
 import kyra.me.chess.scripts.move.Move;
-import kyra.me.chess.scripts.move.MoveType;
 import kyra.me.chess.scripts.pieces.*;
 import kyra.me.chess.scripts.players.AI;
 import kyra.me.chess.scripts.players.HumanPlayer;
@@ -18,7 +17,6 @@ import javax.sound.sampled.*;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class GameManager {
@@ -30,11 +28,15 @@ public class GameManager {
     public static Player playerOne;
     public static Player playerTwo;
     public static int turnCount; //used to decide if the game is a draw
+    public static boolean isCheck;
+    public static boolean isDoubleCheck;
 
     public static void gameStart(){
         gameState = GameState.normal;
         lastMove = null;
         turnCount = 0;
+        isCheck = false;
+        isDoubleCheck = false;
         int col = 1, row = 8;
 
         for (int i = 0; i < FEN.length(); i++) {
@@ -142,6 +144,8 @@ public class GameManager {
         //moveGeneration(5);
     }
     public static void turnStart(){
+        isCheck = false;
+        isDoubleCheck = false;
         if (lastMove != null) {
             isWhiteTurn = !isWhiteTurn;
             if (lastMove.isCapture() || lastMove.getMovingPiece() instanceof Pawn){
@@ -186,21 +190,13 @@ public class GameManager {
 
     public static void checkWinner(){
         if (Database.getMoves().isEmpty()){
-            isWhiteTurn = !isWhiteTurn;
-            for (Piece piece: Database.getPieces()){
-                if (isWhiteTurn == piece.isWhite()){
-                    piece.createMoves(Database.getMoves());
-                }
-            }
-
-            if (!lastMove.isCheck()){
+            if (!isCheck){
                 gameState = GameState.draw;
             }
             else if (isWhiteTurn){
                 gameState = GameState.whiteWon;
             }
             else { gameState = GameState.blackWon; }
-
         }
         else if (turnCount >= 50){
             gameState = GameState.draw;
@@ -233,7 +229,7 @@ public class GameManager {
     public static void playAudio(){
         if (lastMove == null) { return; }
 
-        if (lastMove.isCheck()) {
+        if (isCheck) {
             GameManager.audio[2].stop(); //resets the audio clip so it can be replayed
             GameManager.audio[2].setFramePosition(0);
             GameManager.audio[2].start();
