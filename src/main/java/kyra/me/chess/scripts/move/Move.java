@@ -3,6 +3,7 @@ package kyra.me.chess.scripts.move;
 import kyra.me.chess.scripts.managers.Database;
 import kyra.me.chess.scripts.managers.GameManager;
 import kyra.me.chess.scripts.pieces.King;
+import kyra.me.chess.scripts.pieces.Pawn;
 import kyra.me.chess.scripts.pieces.Piece;
 import kyra.me.chess.scripts.tile.Tile;
 
@@ -90,19 +91,7 @@ public abstract class Move {
         endingSquare.setOccupyingPiece(capturedPiece);
         movingPiece.setOccupiedTile(startingSquare);
 
-        if (moveType == MoveType.enPassant){
-            endingSquare.setOccupyingPiece(null);
-            int color = movingPiece.isWhite()? 1: -1; //if white, the pawn goes up. if black, the pawn goes down
-            Tile t = Database.getTile(endingSquare.getXPosition(), endingSquare.getYPosition() + color);
-            t.setOccupyingPiece(capturedPiece);
-            capturedPiece.setOccupiedTile(t);
-        }
         GameManager.isWhiteTurn = !GameManager.isWhiteTurn;
-    }
-    public void initializeIsCheck(){
-        List<Move> m = new ArrayList<>();
-        movingPiece.createMoves(m);
-        isCheck = m.stream().anyMatch(t -> t.capturedPiece instanceof King);
     }
 
     public boolean isCheck() { return isCheck; }
@@ -112,4 +101,5 @@ public abstract class Move {
     public Piece getMovingPiece() { return movingPiece; }
     public Piece getCapturedPiece() { return capturedPiece; }
     public MoveType getType() { return moveType; }
+    public void setIsCheck(boolean isCheck) { this.isCheck = isCheck; }
 }

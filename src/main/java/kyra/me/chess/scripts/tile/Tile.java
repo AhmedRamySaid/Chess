@@ -14,6 +14,7 @@ public class Tile extends Rectangle {
     private final int yPosition;
     private Piece occupyingPiece;
     private Circle playableMove;
+    private boolean isUnderAttack;
 
     public Tile(int x, int y, StackPane pane) {
         pane.getChildren().add(this);
@@ -24,6 +25,7 @@ public class Tile extends Rectangle {
         playableMove.radiusProperty().bind(widthProperty().divide(6));
         playableMove.setFill(Color.RED);
         playableMove.setOpacity(0);
+        isUnderAttack = false;
 
         setOnMouseEntered(event -> {
             this.setOpacity(0.5);
@@ -78,6 +80,16 @@ public class Tile extends Rectangle {
         setColor(Color.WHITE, Color.SADDLEBROWN);
     }
 
+    public void toggleUnderAttackOn(boolean isWhite){
+        if (occupyingPiece != null) {
+            if (occupyingPiece.isWhite() == isWhite) { return; }
+        }
+        isUnderAttack = true;
+    }
+    public void toggleUnderAttackOff(){
+        isUnderAttack = false;
+    }
+
     public void setColor(Color mainColor, Color offsetColor) {
         if (xPosition%2 == yPosition%2){
             this.setFill(offsetColor);
@@ -99,6 +111,7 @@ public class Tile extends Rectangle {
     public void setOccupyingPiece(Piece piece) { occupyingPiece = piece; }
     public Piece getOccupyingPiece() { return occupyingPiece; }
     public StackPane getStackPane() { return (StackPane)getParent(); }
+    public boolean isUnderAttack() { return isUnderAttack; }
     public int getXPosition(){ return xPosition; }
     public int getYPosition(){ return yPosition; }
 }

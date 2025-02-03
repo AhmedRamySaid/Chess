@@ -8,7 +8,8 @@ import kyra.me.chess.scripts.tile.Tile;
 import java.util.List;
 
 public interface DiagonalMovingPiece {
-    default void createDiagonalMove(List<Move> moves, Piece piece, int xDirection, int yDirection){
+    default void createDiagonalMove(List<Move> moves, int xDirection, int yDirection){
+        Piece piece = (Piece)this;
         int x = piece.getOccupiedTile().getXPosition() + xDirection;
         int y = piece.getOccupiedTile().getYPosition() + yDirection;
 
@@ -24,6 +25,24 @@ public interface DiagonalMovingPiece {
 
             Move move = new NormalMove(piece.occupiedTile, t);
             moves.add(move);
+            x += xDirection;
+            y += yDirection;
+        }
+    }
+
+    default void createDiagonalAttack(int xDirection, int yDirection ){
+        Piece piece = (Piece)this;
+        int x = piece.getOccupiedTile().getXPosition() + xDirection;
+        int y = piece.getOccupiedTile().getYPosition() + yDirection;
+
+        while (x >= 1 && x <=8 && y >= 1 && y <=8){
+            Tile t = Database.getTile(x, y);
+            if (t.getOccupyingPiece() != null){
+                t.toggleUnderAttackOn(piece.isWhite);
+                return;
+            }
+
+            t.toggleUnderAttackOn(piece.isWhite);
             x += xDirection;
             y += yDirection;
         }

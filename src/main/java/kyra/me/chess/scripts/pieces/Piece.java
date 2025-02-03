@@ -19,6 +19,13 @@ public abstract class Piece extends ImageView {
     Tile occupiedTile;
     boolean isWhite;
     boolean hasMoved;
+    //this tells the piece in which direction a DiagonalMovingPiece is staring it down, pinning it to the king
+    //0 means it is not pinned
+    //1 means it is pinned horizontally
+    //2 means it is pinned vertically
+    //3 means it is pinned north-east to south-west
+    //4 means it is pinned north-west to south-east
+    //int pinDirection;
     //white pawn  (0), black pawn (1), white knight (2), black knight (3), white bishop (4), black bishop (5),
     // white rook (6), black rook (7), white queen (8), black queen (9), white king (10), black king (11)
     static Image[] models = {new Image(Piece.class.getResourceAsStream("/kyra/me/chess/assets/models/pieces/white pawn.png")), new Image(Piece.class.getResourceAsStream("/kyra/me/chess/assets/models/pieces/black pawn.png")), new Image(Piece.class.getResourceAsStream("/kyra/me/chess/assets/models/pieces/white knight.png")), new Image(Piece.class.getResourceAsStream("/kyra/me/chess/assets/models/pieces/black knight.png")), new Image(Piece.class.getResourceAsStream("/kyra/me/chess/assets/models/pieces/white bishop.png")), new Image(Piece.class.getResourceAsStream("/kyra/me/chess/assets/models/pieces/black bishop.png")), new Image(Piece.class.getResourceAsStream("/kyra/me/chess/assets/models/pieces/white rook.png")), new Image(Piece.class.getResourceAsStream("/kyra/me/chess/assets/models/pieces/black rook.png")), new Image(Piece.class.getResourceAsStream("/kyra/me/chess/assets/models/pieces/white queen.png")), new Image(Piece.class.getResourceAsStream("/kyra/me/chess/assets/models/pieces/black queen.png")), new Image(Piece.class.getResourceAsStream("/kyra/me/chess/assets/models/pieces/white king.png")), new Image(Piece.class.getResourceAsStream("/kyra/me/chess/assets/models/pieces/black king.png"))};
@@ -52,7 +59,8 @@ public abstract class Piece extends ImageView {
         move.doMove();
     }
 
-    abstract public void createMoves(List<Move> moves);
+    public abstract void createMoves(List<Move> moves);
+    public abstract void createAttacks();
 
     public void destroy() {
         Database.removePiece(this);

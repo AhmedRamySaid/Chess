@@ -40,6 +40,26 @@ public class Knight extends Piece {
         }
     }
 
+    @Override
+    public void createAttacks(){
+        int[] values = {1, 2};
+
+        // Iterate through {1, 2}, {-1, 2}, {1, -2}, {-1, -2}
+        for (int i = 0; i < 4; i++) {
+            Tile t = Database.getTile(occupiedTile.getXPosition() + values[0], occupiedTile.getYPosition() + values[1]);
+            if (t != null) { t.toggleUnderAttackOn(isWhite); }
+            t = Database.getTile(occupiedTile.getXPosition() + values[1], occupiedTile.getYPosition() + values[0]);
+            if (t != null) { t.toggleUnderAttackOn(isWhite); }
+
+            // Perform the transformation
+            if (i % 2 == 0) {
+                values[0] = -values[0];  // Toggle the first value
+            } else {
+                values[1] = -values[1];  // Toggle the second value
+            }
+        }
+    }
+
     private void addMove(List<Move> moves, Tile endTile){
         if (endTile == null) { return; }
         if (endTile.getOccupyingPiece() != null) {

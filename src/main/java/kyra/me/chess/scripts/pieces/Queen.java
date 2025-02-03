@@ -20,14 +20,27 @@ public class Queen extends Piece implements DiagonalMovingPiece{
 
     @Override
     public void createMoves(List<Move> moves) {
-        createDiagonalMove(moves, this, 0, 1);
-        createDiagonalMove(moves, this, 0, -1);
-        createDiagonalMove(moves, this, 1, 0);
-        createDiagonalMove(moves, this, -1, -0);
+        createDiagonalMove(moves, 0, 1);
+        createDiagonalMove(moves, 0, -1);
+        createDiagonalMove(moves, 1, 0);
+        createDiagonalMove(moves, -1, -0);
 
-        createDiagonalMove(moves, this, 1, 1);
-        createDiagonalMove(moves, this, -1, 1);
-        createDiagonalMove(moves, this, 1, -1);
-        createDiagonalMove(moves, this, -1, -1);
+        createDiagonalMove(moves, 1, 1);
+        createDiagonalMove(moves, -1, 1);
+        createDiagonalMove(moves, 1, -1);
+        createDiagonalMove(moves, -1, -1);
+    }
+
+    @Override
+    public void createAttacks(){
+        createDiagonalAttack(1, 1);
+        createDiagonalAttack(-1, 1);
+        createDiagonalAttack(1, -1);
+        createDiagonalAttack(-1, -1);
+
+        createDiagonalAttack(0, 1);
+        createDiagonalAttack(0, -1);
+        createDiagonalAttack(1, 0);
+        createDiagonalAttack(-1, 0);
     }
 }

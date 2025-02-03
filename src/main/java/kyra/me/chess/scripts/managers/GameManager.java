@@ -7,10 +7,12 @@ import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import kyra.me.chess.Chess;
 import kyra.me.chess.scripts.move.Move;
+import kyra.me.chess.scripts.move.MoveType;
 import kyra.me.chess.scripts.pieces.*;
 import kyra.me.chess.scripts.players.AI;
 import kyra.me.chess.scripts.players.HumanPlayer;
 import kyra.me.chess.scripts.players.Player;
+import kyra.me.chess.scripts.tile.Tile;
 
 import javax.sound.sampled.*;
 import java.io.BufferedInputStream;
@@ -20,7 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class GameManager {
-    public static String FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w";
+    public static String FEN = "rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w";
     public static boolean isWhiteTurn = true; //will change to true on start
     public static Clip[] audio = new Clip[3];
     public static GameState gameState;
@@ -139,12 +141,7 @@ public class GameManager {
         }
         turnStart();
 
-//        moveGeneration(1);
-//        moveGeneration(2);
-//        moveGeneration(3);
-//        moveGeneration(4);
-//        moveGeneration(5);
-//        moveGeneration(6);
+        moveGeneration(5);
     }
     public static void turnStart(){
         if (lastMove != null) {
@@ -159,12 +156,6 @@ public class GameManager {
         }
 
         Database.clearMoves();
-        for (Piece piece: Database.getPieces()){ //move creation
-            if (isWhiteTurn == piece.isWhite()){
-                piece.createMoves(Database.getMoves());
-            }
-        }
-
         moveCreation(Database.getMoves());
         playAudio();
         checkWinner();
@@ -261,28 +252,60 @@ public class GameManager {
         GameManager.audio[0].start();
     }
 
-    public static void moveCreation(List<Move> moves){
-        for (Piece piece: Database.getPieces()){ //move creation
+    public static void moveCreation(List<Move> moveList){
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                Database.getTile(i,j).toggleUnderAttackOff();
+            }
+        }
+        for (Piece piece: Database.getPieces()){
+            if (isWhiteTurn != piece.isWhite()){
+                piece.createAttacks();
+            }
+        }
+        for (Piece piece: Database.getPieces()){
             if (isWhiteTurn == piece.isWhite()){
-                piece.createMoves(moves);
+                piece.createMoves(moveList);
             }
         }
 
         List<Move> m = new ArrayList<>(); //move validation
-        Iterator<Move> iterator = moves.iterator();
+        Iterator<Move> iterator = moveList.iterator();
         while (iterator.hasNext()){
             Move move = iterator.next();
 
             move.doMoveTemporary();
+            Piece king = null;
+
+            for (int i = 1; i <= 8; i++) {
+                for (int j = 1; j <= 8; j++) {
+                    Database.getTile(i,j).toggleUnderAttackOff();
+                }
+            }
+            for (Piece piece: Database.getPieces()){
+                if (isWhiteTurn != piece.isWhite()){
+                    piece.createAttacks();
+                }
+            }
+
             for (Piece piece: Database.getPieces()){
                 if (isWhiteTurn == piece.isWhite()){
                     piece.createMoves(m);
                 }
+                if (piece instanceof King && piece.isWhite() == isWhiteTurn){
+                    king = piece;
+                }
             }
-            m.stream().filter(t -> t.getCapturedPiece() instanceof King).findAny().ifPresentOrElse(
-                    badMove -> iterator.remove(), move::initializeIsCheck
-            );
+            try {
+                if (king.getOccupiedTile().isUnderAttack()) {
+                    move.setIsCheck(true); }
+            } catch (RuntimeException e) {
+                endGame();
+            }
+            m.stream().filter(t -> t.getCapturedPiece() instanceof King).findAny().ifPresent(
+                    badMove -> iterator.remove());
             move.undoMove();
+
             m.clear();
         }
     }
@@ -310,7 +333,7 @@ public class GameManager {
             if (depth == og) {
                 char c1 = (char)(move.getStartingSquare().getXPosition() + 'a' - 1);
                 char c2 = (char)(move.getEndingSquare().getXPosition() + 'a' - 1);
-                //System.out.println( c1 + "" + move.getStartingSquare().getYPosition() + c2 + move.getEndingSquare().getYPosition() + ": " + n);
+                System.out.println( c1 + "" + move.getStartingSquare().getYPosition() + c2 + move.getEndingSquare().getYPosition() + ": " + n);
             }
             numOfPositions += n;
             move.undoMove();

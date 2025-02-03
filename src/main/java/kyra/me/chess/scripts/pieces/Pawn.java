@@ -45,6 +45,7 @@ public class Pawn extends Piece {
             }
         }
 
+        //create attacks
         t = Database.getTile(occupiedTile.getXPosition()+1, occupiedTile.getYPosition() + color);
         if (t != null) {
             if (t.getOccupyingPiece() != null) {
@@ -72,6 +73,25 @@ public class Pawn extends Piece {
             t = Database.getTile(GameManager.lastMove.getEndingSquare().getXPosition(), occupiedTile.getYPosition() + color);
             Move move = new NormalMove(occupiedTile, t, MoveType.enPassant);
             moves.add(move);
+        }
+    }
+
+    public void createAttacks(){
+        int color = isWhite? 1: -1; //if white, the pawn goes up. if black, the pawn goes down
+        Tile t;
+
+        t = Database.getTile(occupiedTile.getXPosition()+1, occupiedTile.getYPosition() + color);
+        if (t != null) {
+            if (t.getOccupyingPiece() != null) {
+                t.toggleUnderAttackOn(isWhite);
+            }
+        }
+
+        t = Database.getTile(occupiedTile.getXPosition()-1, occupiedTile.getYPosition() + color);
+        if (t != null) {
+            if (t.getOccupyingPiece() != null) {
+                t.toggleUnderAttackOn(isWhite);
+            }
         }
     }
 

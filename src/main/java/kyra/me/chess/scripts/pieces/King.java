@@ -1,13 +1,11 @@
 package kyra.me.chess.scripts.pieces;
 
 import kyra.me.chess.scripts.managers.Database;
-import kyra.me.chess.scripts.managers.GameManager;
 import kyra.me.chess.scripts.move.CastlingMove;
 import kyra.me.chess.scripts.move.Move;
 import kyra.me.chess.scripts.move.NormalMove;
 import kyra.me.chess.scripts.tile.Tile;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class King extends Piece {
@@ -36,6 +34,7 @@ public class King extends Piece {
                 }
                 tile = Database.getTile(occupiedTile.getXPosition() + i, occupiedTile.getYPosition() + j);
                 if (tile == null) { continue; }
+                if (tile.isUnderAttack()) { continue; }
                 if (tile.getOccupyingPiece() != null) {
                     if (tile.getOccupyingPiece().isWhite() != isWhite()) {
                         Move move = new NormalMove(occupiedTile, tile);
@@ -48,7 +47,7 @@ public class King extends Piece {
             }
         }
 
-        //WARNING: THIS PART IS NOT COMPLETE. MUST CHECK FOR AN ATTACK
+        if (occupiedTile.isUnderAttack()) { return; }
         if (!hasMoved) {
             int x = getOccupiedTile().getXPosition() - 1;
 
@@ -63,9 +62,8 @@ public class King extends Piece {
                     moves.add(move);
                 }
                 //if there is a non-empty square in the middle, don't create the move
-                if (tile.getOccupyingPiece() != null){
-                    break;
-                }
+                if (tile.getOccupyingPiece() != null){ break; }
+                if (tile.isUnderAttack()) { break; }
 
                 x--;
             }
@@ -79,11 +77,25 @@ public class King extends Piece {
                             (Rook)tile.getOccupyingPiece(), Database.getTile(6, getOccupiedTile().getYPosition()) );
                     moves.add(move);
                 }
-                if (tile.getOccupyingPiece() != null){
-                    break;
-                }
+                if (tile.getOccupyingPiece() != null){ break; }
+                if (tile.isUnderAttack()) { break; }
 
                 x++;
+            }
+        }
+    }
+
+    @Override
+    public void createAttacks(){
+        Tile tile;
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; j++) {
+                if (i == 0 && j == 0) {
+                    continue;
+                }
+                tile = Database.getTile(occupiedTile.getXPosition() + i, occupiedTile.getYPosition() + j);
+                if (tile == null) { continue; }
+                tile.toggleUnderAttackOn(isWhite);
             }
         }
     }
