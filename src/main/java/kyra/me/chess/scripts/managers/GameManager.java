@@ -138,6 +138,13 @@ public class GameManager {
             rotateProfilesAndTimer();
         }
         turnStart();
+
+//        moveGeneration(1);
+//        moveGeneration(2);
+//        moveGeneration(3);
+//        moveGeneration(4);
+//        moveGeneration(5);
+//        moveGeneration(6);
     }
     public static void turnStart(){
         if (lastMove != null) {
@@ -280,7 +287,16 @@ public class GameManager {
         }
     }
 
-    public static int moveGeneration(int depth, int og){
+    public static int moveGeneration(int depth){
+        long t1 = System.currentTimeMillis();
+        int n = moveGeneration(depth, depth);
+        System.out.print("Depth: " + depth + " positions: " + n);
+        long t2 = System.currentTimeMillis();
+        System.out.println(" in: " + (t2 - t1) + "ms");
+        return n;
+    }
+    //also prints out the number of positions that appears after each move is played
+    private static int moveGeneration(int depth, int og){
         if (depth == 0){
             return 1;
         }
@@ -291,10 +307,10 @@ public class GameManager {
         for (Move move : moves){
             move.doMoveTemporary();
             int n = moveGeneration(depth - 1, og);
-            if ( depth == og) {
+            if (depth == og) {
                 char c1 = (char)(move.getStartingSquare().getXPosition() + 'a' - 1);
                 char c2 = (char)(move.getEndingSquare().getXPosition() + 'a' - 1);
-                System.out.println( c1 + "" + move.getStartingSquare().getYPosition() + c2 + move.getEndingSquare().getYPosition() + ": " + n);
+                //System.out.println( c1 + "" + move.getStartingSquare().getYPosition() + c2 + move.getEndingSquare().getYPosition() + ": " + n);
             }
             numOfPositions += n;
             move.undoMove();
