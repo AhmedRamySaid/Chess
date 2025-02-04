@@ -23,7 +23,8 @@ import java.util.List;
 
 public class GameManager {
     public static String FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w";
-    public static boolean isWhiteTurn = true; //will change to true on start
+
+    public static boolean isWhiteTurn = true;
     public static boolean isWhiteTurnTemp = true;
     public static Clip[] audio = new Clip[3];
     public static GameState gameState;
@@ -141,6 +142,7 @@ public class GameManager {
 
         if (playerOne instanceof AI) {
             playerOne.setIsWhite(true);
+          
             if (playerTwo instanceof HumanPlayer) {
                 rotateProfilesAndTimer();
                 Chess.board.setRotate(180);
@@ -161,7 +163,8 @@ public class GameManager {
         isDoubleCheck = false;
         if (lastMove != null) {
             isWhiteTurn = !isWhiteTurn;
-            isWhiteTurnTemp = !isWhiteTurnTemp;
+            isWhiteTurnTemp = isWhiteTurn;
+
             if (lastMove.isCapture() || lastMove.getMovingPiece() instanceof Pawn){
                 turnCount = 0;
             }
