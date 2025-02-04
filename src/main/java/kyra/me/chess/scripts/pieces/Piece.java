@@ -25,7 +25,7 @@ public abstract class Piece extends ImageView {
     //2 means it is pinned vertically
     //3 means it is pinned north-east to south-west
     //4 means it is pinned north-west to south-east
-    //int pinDirection;
+    int pinDirection;
     //white pawn  (0), black pawn (1), white knight (2), black knight (3), white bishop (4), black bishop (5),
     // white rook (6), black rook (7), white queen (8), black queen (9), white king (10), black king (11)
     static Image[] models = {new Image(Piece.class.getResourceAsStream("/kyra/me/chess/assets/models/pieces/white pawn.png")), new Image(Piece.class.getResourceAsStream("/kyra/me/chess/assets/models/pieces/black pawn.png")), new Image(Piece.class.getResourceAsStream("/kyra/me/chess/assets/models/pieces/white knight.png")), new Image(Piece.class.getResourceAsStream("/kyra/me/chess/assets/models/pieces/black knight.png")), new Image(Piece.class.getResourceAsStream("/kyra/me/chess/assets/models/pieces/white bishop.png")), new Image(Piece.class.getResourceAsStream("/kyra/me/chess/assets/models/pieces/black bishop.png")), new Image(Piece.class.getResourceAsStream("/kyra/me/chess/assets/models/pieces/white rook.png")), new Image(Piece.class.getResourceAsStream("/kyra/me/chess/assets/models/pieces/black rook.png")), new Image(Piece.class.getResourceAsStream("/kyra/me/chess/assets/models/pieces/white queen.png")), new Image(Piece.class.getResourceAsStream("/kyra/me/chess/assets/models/pieces/black queen.png")), new Image(Piece.class.getResourceAsStream("/kyra/me/chess/assets/models/pieces/white king.png")), new Image(Piece.class.getResourceAsStream("/kyra/me/chess/assets/models/pieces/black king.png"))};
@@ -35,6 +35,7 @@ public abstract class Piece extends ImageView {
         this.setPreserveRatio(true);
         this.setFitHeight(40);
         occupiedTile = tile;
+        pinDirection = 0;
 
         if (occupiedTile != null){
             initialize(occupiedTile);
@@ -98,4 +99,6 @@ public abstract class Piece extends ImageView {
     public boolean isWhite() { return isWhite; }
     public void setHasMoved(boolean moved) { this.hasMoved = moved; }
     public boolean getHasMoved() { return hasMoved; }
+    public void setPinDirection(int pinDirection) { this.pinDirection = pinDirection; }
+    public int getPinDirection() { return pinDirection; }
 }

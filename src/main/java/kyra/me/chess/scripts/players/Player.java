@@ -8,10 +8,11 @@ import java.util.Objects;
 public abstract class Player {
     protected Image profilePicture;
     protected String name;
+    protected boolean isWhite;
 
-    protected Player(String imagePath, String name) {
+    protected Player(String imagePath, String name){
         try {
-        profilePicture = new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath))); }
+            profilePicture = new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath))); }
         catch (Exception e) {
             System.out.println("Error loading profile picture: " + imagePath);
         }
@@ -20,11 +21,12 @@ public abstract class Player {
     }
 
     public static void generateProfiles(){
-        new HumanPlayer("/kyra/me/chess/assets/models/colette.jpg", "Colette");
-        new HumanPlayer("/kyra/me/chess/assets/models/ganyu.jpg", "test");
-        new LevelOneAI("/kyra/me/chess/assets/models/ganyu.jpg", "Ganyu (bot)");
+        new HumanPlayer("/kyra/me/chess/assets/models/profiles/colette.jpg", "Colette");
+        new LevelOneAI("/kyra/me/chess/assets/models/profiles/faith.jpg", "Faith (bot)");
+        new LevelTwoAI("/kyra/me/chess/assets/models/profiles/ganyu.jpg", "Ganyu (bot)");
     }
 
     public Image getProfilePicture() { return profilePicture; }
     public String getName() { return name; }
+    public void setIsWhite(boolean isWhite) { this.isWhite = isWhite; }
 }

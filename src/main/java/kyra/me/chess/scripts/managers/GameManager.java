@@ -1,5 +1,6 @@
 package kyra.me.chess.scripts.managers;
 
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -16,12 +17,14 @@ import kyra.me.chess.scripts.tile.Tile;
 import javax.sound.sampled.*;
 import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
 public class GameManager {
     public static String FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w";
     public static boolean isWhiteTurn = true; //will change to true on start
+    public static boolean isWhiteTurnTemp = true;
     public static Clip[] audio = new Clip[3];
     public static GameState gameState;
     public static Move lastMove;
@@ -136,18 +139,29 @@ public class GameManager {
         }
         catch (UnsupportedAudioFileException | LineUnavailableException | IOException ex) {System.out.println(ex);}
 
-        if (playerOne instanceof AI && playerTwo instanceof HumanPlayer) {
-            rotateProfilesAndTimer();
+        if (playerOne instanceof AI) {
+            playerOne.setIsWhite(true);
+            if (playerTwo instanceof HumanPlayer) {
+                rotateProfilesAndTimer();
+                Chess.board.setRotate(180);
+                for (Node node: Chess.board.getChildren()){
+                    node.setRotate(-180);
+                }
+            }
         }
+        if (playerTwo instanceof AI) {
+            playerTwo.setIsWhite(false);
+        }
+
         turnStart();
 
-        //moveGeneration(5);
     }
     public static void turnStart(){
         isCheck = false;
         isDoubleCheck = false;
         if (lastMove != null) {
             isWhiteTurn = !isWhiteTurn;
+            isWhiteTurnTemp = !isWhiteTurnTemp;
             if (lastMove.isCapture() || lastMove.getMovingPiece() instanceof Pawn){
                 turnCount = 0;
             }
@@ -165,7 +179,12 @@ public class GameManager {
         if (gameState != GameState.normal) { return; }
         if (isWhiteTurn){
             if (playerOne instanceof AI) {
-                ((AI)playerOne).generateMove().doMove();
+                new Thread(() -> {
+                    Move bestMove = ((AI)playerOne).generateMove();  // AI move calculation (long process)
+
+                    // Update UI safely
+                    Platform.runLater(bestMove::doMove);
+                }).start();
                 return;
             }
 
@@ -177,7 +196,12 @@ public class GameManager {
         else
         {
             if (playerTwo instanceof AI) {
-                ((AI)playerTwo).generateMove().doMove();
+                new Thread(() -> {
+                    Move bestMove = ((AI)playerTwo).generateMove();  // AI move calculation (long process)
+
+                    // Update UI safely
+                    Platform.runLater(bestMove::doMove);
+                }).start();
                 return;
             }
 
@@ -189,14 +213,15 @@ public class GameManager {
     }
 
     public static void checkWinner(){
+        //it is the turn of the losing player
         if (Database.getMoves().isEmpty()){
             if (!isCheck){
                 gameState = GameState.draw;
             }
             else if (isWhiteTurn){
-                gameState = GameState.whiteWon;
+                gameState = GameState.blackWon;
             }
-            else { gameState = GameState.blackWon; }
+            else { gameState = GameState.whiteWon; }
         }
         else if (turnCount >= 50){
             gameState = GameState.draw;
@@ -254,6 +279,9 @@ public class GameManager {
             }
         }
         for (Piece piece: Database.getPieces()){
+            piece.setPinDirection(0);
+        }
+        for (Piece piece: Database.getPieces()){
             if (isWhiteTurn != piece.isWhite()){
                 piece.createAttacks();
             }
@@ -265,32 +293,31 @@ public class GameManager {
         }
     }
 
-    public static int moveGeneration(int depth){
+    public static void moveGeneration(int depth){
         long t1 = System.currentTimeMillis();
-        int n = moveGeneration(depth, depth);
+        BigInteger n = moveGeneration(depth, depth);
         System.out.print("Depth: " + depth + " positions: " + n);
         long t2 = System.currentTimeMillis();
         System.out.println(" in: " + (t2 - t1) + "ms");
-        return n;
     }
     //also prints out the number of positions that appears after each move is played
-    private static int moveGeneration(int depth, int og){
+    private static BigInteger moveGeneration(int depth, int og){
         if (depth == 0){
-            return 1;
+            return BigInteger.ONE;
         }
-        int numOfPositions = 0;
+        BigInteger numOfPositions = BigInteger.ZERO;
         List<Move> moves = new ArrayList<>();
         moveCreation(moves);
 
         for (Move move : moves){
             move.doMoveTemporary();
-            int n = moveGeneration(depth - 1, og);
+            BigInteger n = moveGeneration(depth - 1, og);
             if (depth == og) {
                 char c1 = (char)(move.getStartingSquare().getXPosition() + 'a' - 1);
                 char c2 = (char)(move.getEndingSquare().getXPosition() + 'a' - 1);
                 System.out.println( c1 + "" + move.getStartingSquare().getYPosition() + c2 + move.getEndingSquare().getYPosition() + ": " + n);
             }
-            numOfPositions += n;
+            numOfPositions = numOfPositions.add(n);
             move.undoMove();
         }
         return numOfPositions;

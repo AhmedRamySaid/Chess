@@ -14,11 +14,19 @@ public interface DiagonalMovingPiece {
         boolean isPinned = piece.getOccupiedTile().isUnderPin();
         int x = piece.getOccupiedTile().getXPosition() + xDirection;
         int y = piece.getOccupiedTile().getYPosition() + yDirection;
+        int pinDirection;
+
+        if (yDirection == 0) pinDirection = 1;
+        else if (xDirection == 0) pinDirection = 2;
+        else if (xDirection == yDirection) pinDirection = 3;
+        else pinDirection = 4;
+        if (piece.getPinDirection() != 0 && piece.getPinDirection() != pinDirection) { return; }
 
         while (x >= 1 && x <=8 && y >= 1 && y <=8){
             Tile t = Database.getTile(x, y);
             if (t.getOccupyingPiece() != null){
                 if (t.getOccupyingPiece().isWhite() == piece.isWhite()) { return; }
+                if (GameManager.isCheck && !t.isUnderCheck()) { return; }
 
                 if (!isPinned || t.isUnderPin()){
                     Move move = new NormalMove(piece.occupiedTile, t);
@@ -27,12 +35,14 @@ public interface DiagonalMovingPiece {
                 return;
             }
 
-            if (!isPinned || t.isUnderPin()){
-                Move move = new NormalMove(piece.occupiedTile, t);
-                moves.add(move);
-            }
             x += xDirection;
             y += yDirection;
+
+            if (isPinned && !t.isUnderPin()) { return; }
+            if (GameManager.isCheck && !t.isUnderCheck()) { continue; }
+
+            Move move = new NormalMove(piece.occupiedTile, t);
+            moves.add(move);
         }
     }
 
@@ -44,8 +54,15 @@ public interface DiagonalMovingPiece {
         boolean isCheckTemp = true;
         Piece piece = (Piece)this;
         Tile tile;
+
+        int pinDirection;
+        if (yDirection == 0) pinDirection = 1;
+        else if (xDirection == 0) pinDirection = 2;
+        else if (xDirection == yDirection) pinDirection = 3;
+        else pinDirection = 4;
+
         Piece enemyKing = Database.getPieces().stream().filter(t -> t instanceof King && t.isWhite != piece.isWhite).findFirst().orElse(null);
-        if (enemyKing == null) { GameManager.endGame(); }
+        if (enemyKing == null) { throw  new IllegalThreadStateException("King does not exist how did you get here"); }
 
         int x = piece.getOccupiedTile().getXPosition() + xDirection;
         int y = piece.getOccupiedTile().getYPosition() + yDirection;
@@ -60,7 +77,7 @@ public interface DiagonalMovingPiece {
                     isCheck =  isCheck || ( isCheckTemp && (!hitPieceFlag && (tile.getOccupyingPiece().isWhite() != piece.isWhite)) );
 
                     //found a successful pin
-                    isPin = isPinTemp;
+                    isPin = isPinTemp && tile.getOccupyingPiece().isWhite != piece.isWhite;
                 } else{
                     //if the first piece you hit is a non-king of the opposite color, a pin might be possible
                     isPinTemp = !hitPieceFlag && (tile.getOccupyingPiece().isWhite() != piece.isWhite);
@@ -68,11 +85,11 @@ public interface DiagonalMovingPiece {
                     isCheckTemp = false;
                 }
 
-                if (!hitPieceFlag) tile.toggleUnderAttackOn(piece.isWhite);
+                if (!hitPieceFlag) tile.toggleUnderAttackOn();
                 hitPieceFlag = true;
             }
 
-            if (!hitPieceFlag) tile.toggleUnderAttackOn(piece.isWhite);
+            if (!hitPieceFlag) tile.toggleUnderAttackOn();
             x += xDirection;
             y += yDirection;
         }
@@ -86,6 +103,7 @@ public interface DiagonalMovingPiece {
         x = piece.getOccupiedTile().getXPosition() + xDirection;
         y = piece.getOccupiedTile().getYPosition() + yDirection;
 
+        isCheckTemp = isCheck;
         //loop again to apply the pin or check
         while (x >= 1 && x <=8 && y >= 1 && y <=8){
             tile = Database.getTile(x, y);
@@ -97,11 +115,14 @@ public interface DiagonalMovingPiece {
 
                     isCheck = false;
                     isPin = false;
+                } else {
+                    if (isPin) tile.getOccupyingPiece().setPinDirection(pinDirection);
                 }
             }
 
             if (isCheck) tile.toggleUnderCheckOn();
             if (isPin) tile.toggleUnderPinOn();
+            if (isCheckTemp) tile.toggleUnderAttackOn();
             x += xDirection;
             y += yDirection;
         }

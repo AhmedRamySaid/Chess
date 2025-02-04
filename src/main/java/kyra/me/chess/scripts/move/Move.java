@@ -19,8 +19,11 @@ public abstract class Move {
     final boolean isCapture;
     boolean isCheck;
 
+    //stores the variables in GameManager so it can do and undo moves
     boolean movingPieceHasMoved;
     Move lastMove;
+    boolean kingInCheck;
+    boolean kingInDoubleCheck;
 
     public Move(Tile start, Tile end){
         this(start, end, MoveType.normal);
@@ -68,9 +71,11 @@ public abstract class Move {
             Database.removePiece(capturedPiece);
         }
 
+        //saves values so it can reset them later
         this.movingPieceHasMoved = movingPiece.getHasMoved();
+        this.kingInCheck = GameManager.isCheck;
+        this.kingInDoubleCheck = GameManager.isDoubleCheck;
         this.lastMove = GameManager.lastMove;
-        GameManager.lastMove = this;
 
         movingPiece.setHasMoved(true);
         startingSquare.setOccupyingPiece(null);
@@ -78,6 +83,9 @@ public abstract class Move {
         endingSquare.setOccupyingPiece(movingPiece);
 
         GameManager.isWhiteTurn = !GameManager.isWhiteTurn;
+        GameManager.isCheck = false;
+        GameManager.isDoubleCheck = false;
+        GameManager.lastMove = this;
     }
     public void undoMove(){
         if (isCapture){
@@ -85,6 +93,8 @@ public abstract class Move {
         }
 
         movingPiece.setHasMoved(this.movingPieceHasMoved);
+        GameManager.isCheck = this.kingInCheck;
+        GameManager.isDoubleCheck = this.kingInDoubleCheck;
         GameManager.lastMove = this.lastMove;
 
         startingSquare.setOccupyingPiece(movingPiece);

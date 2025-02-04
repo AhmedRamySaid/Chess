@@ -82,22 +82,19 @@ public class Tile extends Rectangle {
         setColor(Color.WHITE, Color.SADDLEBROWN);
     }
 
-    public void toggleUnderAttackOn(boolean isWhite){
+    public void toggleUnderAttackOn(){
         isUnderAttack = true;
     }
     public void toggleUnderPinOn(){
         isUnderPin = true;
-        //setColor(Color.ORANGE, Color.ORANGE);
     }
     public void toggleUnderCheckOn(){
         isUnderCheck = true;
-        //setColor(Color.RED, Color.RED);
     }
     public void toggleAllOff(){
         isUnderAttack = false;
         isUnderPin = false;
         isUnderCheck = false;
-        //setColor(Color.WHITE, Color.SADDLEBROWN);
     }
 
     public void setColor(Color mainColor, Color offsetColor) {
@@ -123,6 +120,7 @@ public class Tile extends Rectangle {
     public StackPane getStackPane() { return (StackPane)getParent(); }
     public boolean isUnderAttack() { return isUnderAttack; }
     public boolean isUnderPin() { return isUnderPin; }
+    public boolean isUnderCheck() { return isUnderCheck; }
     public int getXPosition(){ return xPosition; }
     public int getYPosition(){ return yPosition; }
 }

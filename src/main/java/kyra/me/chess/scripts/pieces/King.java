@@ -63,7 +63,9 @@ public class King extends Piece {
                 }
                 //if there is a non-empty square in the middle, don't create the move
                 if (tile.getOccupyingPiece() != null){ break; }
-                if (tile.isUnderAttack()) { break; }
+                if (tile.getXPosition() != 2) {
+                    if (tile.isUnderAttack()) { break; }
+                }
 
                 x--;
             }
@@ -95,7 +97,7 @@ public class King extends Piece {
                 }
                 tile = Database.getTile(occupiedTile.getXPosition() + i, occupiedTile.getYPosition() + j);
                 if (tile == null) { continue; }
-                tile.toggleUnderAttackOn(isWhite);
+                tile.toggleUnderAttackOn();
             }
         }
     }

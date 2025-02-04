@@ -51,9 +51,29 @@ public class Knight extends Piece {
         // Iterate through {1, 2}, {-1, 2}, {1, -2}, {-1, -2}
         for (int i = 0; i < 4; i++) {
             Tile t = Database.getTile(occupiedTile.getXPosition() + values[0], occupiedTile.getYPosition() + values[1]);
-            if (t != null) { t.toggleUnderAttackOn(isWhite); }
+            if (t != null) {
+                t.toggleUnderAttackOn();
+                if (t.getOccupyingPiece() instanceof King){
+                    if (t.getOccupyingPiece().isWhite != isWhite){
+                        t.toggleUnderCheckOn();
+                        GameManager.isDoubleCheck = GameManager.isCheck;
+                        GameManager.isCheck = true;
+                        occupiedTile.toggleUnderCheckOn();
+                    }
+                }
+            }
             t = Database.getTile(occupiedTile.getXPosition() + values[1], occupiedTile.getYPosition() + values[0]);
-            if (t != null) { t.toggleUnderAttackOn(isWhite); }
+            if (t != null) {
+                t.toggleUnderAttackOn();
+                if (t.getOccupyingPiece() instanceof King){
+                    if (t.getOccupyingPiece().isWhite != isWhite){
+                        t.toggleUnderCheckOn();
+                        GameManager.isDoubleCheck = GameManager.isCheck;
+                        GameManager.isCheck = true;
+                        occupiedTile.toggleUnderCheckOn();
+                    }
+                }
+            }
 
             // Perform the transformation
             if (i % 2 == 0) {
@@ -65,12 +85,13 @@ public class Knight extends Piece {
     }
 
     private void addMove(List<Move> moves, Tile endTile){
-        if (endTile == null) { return; }
+        if (endTile == null) return;
         if (endTile.getOccupyingPiece() != null) {
             if (endTile.getOccupyingPiece().isWhite() == isWhite()) {
                 return;
             }
         }
+        if (GameManager.isCheck && !endTile.isUnderCheck()) return;
         Move move = new NormalMove(occupiedTile, endTile);
         moves.add(move);
     }
