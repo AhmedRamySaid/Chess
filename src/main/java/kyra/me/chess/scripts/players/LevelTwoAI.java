@@ -24,7 +24,6 @@ public class LevelTwoAI extends AI {
 
     @Override
     public Move generateMove(){
-        try { Thread.sleep(2000); } catch (InterruptedException e) { e.printStackTrace(); }
         Move move = search(4);
         if (move != null) return move;
         return Database.getMoves().getFirst();
