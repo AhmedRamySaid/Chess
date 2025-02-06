@@ -24,26 +24,23 @@ public class LevelTwoAI extends AI {
 
     @Override
     public Move generateMove(){
-        Move move = search(4);
+        Move move = search(5);
         if (move != null) return move;
         return Database.getMoves().getFirst();
     }
 
-    public static float Evaluate(){
+    public float Evaluate(){
+        int myColor = this.isWhite? 1 : -1; //make result always positive if in AI's favour
         List<Move> moves = new ArrayList<>();
         moveCreation(moves);
-        if (moves.isEmpty()){
-            if (GameManager.lastMove.isCheck()){
-                if (!isWhiteTurn) {
-                    return 10000;
-                }
-                else {
-                    return -10000;
-                }
-            } else {
-                return 0;
+
+        if (moves.isEmpty()) {
+            if (GameManager.lastMove.isCheck()) {
+                return isWhiteTurn ? Float.NEGATIVE_INFINITY * myColor : Float.POSITIVE_INFINITY * myColor;
             }
+            return 0;
         }
+
         float material = 0;
         for (Piece piece: Database.getPieces()){
             int color = piece.isWhite()? 1: -1;
@@ -67,82 +64,63 @@ public class LevelTwoAI extends AI {
                     break;
             }
         }
-        return material;
+        return material * myColor;
     }
 
-    private Move search(int depth){
+    private Move search(int depth) {
         Move[] move = new Move[1];
-        search(depth, depth, move, true);
+        search(depth, depth, move, true, Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY);
         return move[0];
     }
-    private float search(int depth, int origDepth, Move[] bestMove, boolean myChoice){
-        if (depth == 0){
+
+    private float search(int depth, int origDepth, Move[] bestMove, boolean myChoice, float alpha, float beta) {
+        if (depth == 0) {
             return Evaluate();
         }
+
         List<Move> moves = new ArrayList<>();
         moveCreation(moves);
-        if (moves.isEmpty()){
-            if (GameManager.lastMove.isCheck()){
-                if (!isWhiteTurn) {
-                    return 10000;
-                }
-                else {
-                    return -10000;
-                }
-            } else {
-                return 0;
+        int myColor = this.isWhite? 1 : -1; //make result always positive if in AI's favour
+
+        if (moves.isEmpty()) {
+            if (GameManager.lastMove.isCheck()) {
+                return isWhiteTurn ? Float.NEGATIVE_INFINITY * myColor : Float.POSITIVE_INFINITY * myColor;
             }
+            return 0;
         }
 
-        List<Float> evaluations = new ArrayList<>();
-        float evaluation;
-        int pos = 0;
+        float bestEvaluation = myChoice ? Float.NEGATIVE_INFINITY : Float.POSITIVE_INFINITY;
+        int bestMoveIndex = 0;
 
-        for (Move move : moves){
+        for (int i = 0; i < moves.size(); i++) {
+            Move move = moves.get(i);
             move.doMoveTemporary();
-            evaluation = search(depth - 1, origDepth,bestMove, !myChoice);
-            evaluations.add(pos++, evaluation);
+            float evaluation = search(depth - 1, origDepth, bestMove, !myChoice, alpha, beta);
             move.undoMove();
-        }
-        evaluation = evaluations.getFirst();
-        pos = 0;
 
-        if (isWhite && myChoice){ //my choice
-           for (int i = 1; i < evaluations.size(); i++){
-               if (evaluations.get(i) > evaluation){
-                   evaluation = evaluations.get(i);
-                   pos = i;
-               }
-           }
-        }
-        else if (isWhite){ //opponent's choice
-            for (int i = 1; i < evaluations.size(); i++){
-                if (evaluations.get(i) < evaluation){
-                    evaluation = evaluations.get(i);
-                    pos = i;
+            if (myChoice) {  // Maximizing player (AI)
+                if (evaluation > bestEvaluation) {
+                    bestEvaluation = evaluation;
+                    bestMoveIndex = i;
                 }
+                alpha = Math.max(alpha, bestEvaluation);
+            } else {  // Minimizing player (Opponent)
+                if (evaluation < bestEvaluation) {
+                    bestEvaluation = evaluation;
+                    bestMoveIndex = i;
+                }
+                beta = Math.min(beta, bestEvaluation);
             }
-        }
-        else if (myChoice){ //my choice
-            for (int i = 1; i < evaluations.size(); i++){
-                if (evaluations.get(i) < evaluation){
-                    evaluation = evaluations.get(i);
-                    pos = i;
-                }
-            }
-        }
-        else { //opponent's choice
-            for (int i = 1; i < evaluations.size(); i++){
-                if (evaluations.get(i) > evaluation){
-                    evaluation = evaluations.get(i);
-                    pos = i;
-                }
+
+            if (beta <= alpha) {  // Prune remaining branches
+                break;
             }
         }
 
         if (depth == origDepth) {
-            bestMove[0] = moves.get(pos);
+            bestMove[0] = moves.get(bestMoveIndex);
         }
-        return evaluation;
+
+        return bestEvaluation;
     }
 }

@@ -77,7 +77,7 @@ public interface DiagonalMovingPiece {
                     isCheck =  isCheck || ( isCheckTemp && (!hitPieceFlag && (tile.getOccupyingPiece().isWhite() != piece.isWhite)) );
 
                     //found a successful pin
-                    isPin = isPinTemp && tile.getOccupyingPiece().isWhite != piece.isWhite;
+                    isPin = isPin || (isPinTemp && tile.getOccupyingPiece().isWhite != piece.isWhite);
                 } else{
                     //if the first piece you hit is a non-king of the opposite color, a pin might be possible
                     isPinTemp = !hitPieceFlag && (tile.getOccupyingPiece().isWhite() != piece.isWhite);

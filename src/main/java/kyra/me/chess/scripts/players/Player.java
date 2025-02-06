@@ -24,6 +24,7 @@ public abstract class Player {
         new HumanPlayer("/kyra/me/chess/assets/models/profiles/colette.jpg", "Colette");
         new LevelOneAI("/kyra/me/chess/assets/models/profiles/faith.jpg", "Faith (bot)");
         new LevelTwoAI("/kyra/me/chess/assets/models/profiles/ganyu.jpg", "Ganyu (bot)");
+        new LevelThreeAI("/kyra/me/chess/assets/models/profiles/ganyu.jpg", "Colette (bot)");
     }
 
     public Image getProfilePicture() { return profilePicture; }
