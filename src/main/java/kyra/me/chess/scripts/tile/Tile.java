@@ -5,6 +5,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
+import kyra.me.chess.Chess;
 import kyra.me.chess.scripts.managers.Database;
 import kyra.me.chess.scripts.managers.GameManager;
 import kyra.me.chess.scripts.pieces.Piece;
@@ -63,7 +64,7 @@ public class Tile extends Rectangle {
             }
         });
 
-        this.setColor(Color.WHITE, Color.SADDLEBROWN);
+        this.setColor(Chess.tileMainColor, Chess.tileOffsetColor);
         this.widthProperty().bind(getStackPane().prefWidthProperty());
         this.heightProperty().bind(getStackPane().prefHeightProperty());
         Database.addTile(this);
@@ -79,7 +80,7 @@ public class Tile extends Rectangle {
     }
     public void togglePlayableMoveOff(){
         playableMove.setOpacity(0);
-        setColor(Color.WHITE, Color.SADDLEBROWN);
+        setColor(Chess.tileMainColor, Chess.tileOffsetColor);
     }
 
     public void toggleUnderAttackOn(){

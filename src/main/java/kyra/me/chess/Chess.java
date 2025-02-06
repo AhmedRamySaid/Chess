@@ -15,10 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Chess extends Application {
-    List<Tile> tiles = new ArrayList<Tile>();
-    List<Piece> pieces = new ArrayList<Piece>();
-    Color tileMainColor =Color.LIGHTGRAY;
-    Color tileOffsetColor = Color.BROWN;
+    public static Color tileMainColor =Color.WHITE;
+    public static Color tileOffsetColor = Color.SADDLEBROWN;
+
     public static Stage primaryStage;
     public static GridPane board;
     public static VBox sceneVBox;
