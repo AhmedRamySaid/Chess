@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameManager {
-    public static String FEN = "8/5pk1/6pp/8/2n1NKP1/5P1P/4R1r1/8 b";
+    public static String FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w";
     public static boolean isWhiteTurn = true;
     public static boolean isWhiteTurnTemp = true;
     public static Clip[] audio = new Clip[3];
@@ -154,7 +154,6 @@ public class GameManager {
         }
 
         turnStart();
-        moveGeneration(5);
     }
     public static void turnStart(){
         isCheck = false;
