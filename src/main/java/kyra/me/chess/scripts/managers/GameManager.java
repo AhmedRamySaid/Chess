@@ -30,16 +30,20 @@ public class GameManager {
     public static Move lastMove;
     public static Player playerOne;
     public static Player playerTwo;
-    public static int turnCount; //used to decide if the game is a draw
+    public static int turnCount;
+    public static int drawTurnCount; //used to decide if the game is a draw
     public static boolean isCheck;
     public static boolean isDoubleCheck;
+    public static boolean isEarlyGame;
 
     public static void gameStart(){
         gameState = GameState.normal;
         lastMove = null;
         turnCount = 0;
+        drawTurnCount = 0;
         isCheck = false;
         isDoubleCheck = false;
+        isEarlyGame = true;
         int col = 1, row = 8;
 
         for (int i = 0; i < FEN.length(); i++) {
@@ -148,9 +152,11 @@ public class GameManager {
                     node.setRotate(-180);
                 }
             }
+            ((AI) playerOne).setTightOnTime(false);
         }
         if (playerTwo instanceof AI) {
             playerTwo.setIsWhite(false);
+            ((AI) playerTwo).setTightOnTime(false);
         }
 
         turnStart();
@@ -161,15 +167,16 @@ public class GameManager {
         if (lastMove != null) {
             isWhiteTurn = !isWhiteTurn;
             isWhiteTurnTemp = isWhiteTurn;
+            turnCount++;
             if (lastMove.isCapture() || lastMove.getMovingPiece() instanceof Pawn){
-                turnCount = 0;
+                drawTurnCount = 0;
             }
-            else { turnCount++; }
+            else { drawTurnCount++; }
             if (playerOne instanceof HumanPlayer && playerTwo instanceof HumanPlayer) {
                 rotateProfilesAndTimer();
             }
         }
-
+        isEarlyGame = turnCount <= 10;
         Database.clearMoves();
         moveCreation(Database.getMoves());
         playAudio();
@@ -222,7 +229,7 @@ public class GameManager {
             }
             else { gameState = GameState.whiteWon; }
         }
-        else if (turnCount >= 50){
+        else if (drawTurnCount >= 50){
             gameState = GameState.draw;
         }
         else {
@@ -306,7 +313,11 @@ public class GameManager {
         }
         BigInteger numOfPositions = BigInteger.ZERO;
         List<Move> moves = new ArrayList<>();
-        moveCreation(moves);
+        if (depth == og) {
+            moves = Database.getMoves();
+        } else {
+            moveCreation(moves);
+        }
 
         for (Move move : moves){
             move.doMoveTemporary();

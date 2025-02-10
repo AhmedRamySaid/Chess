@@ -1,6 +1,5 @@
 package kyra.me.chess.scripts.controllers;
 
-import javafx.animation.AnimationTimer;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.binding.Bindings;
@@ -19,6 +18,7 @@ import kyra.me.chess.Chess;
 import kyra.me.chess.scripts.managers.Database;
 import kyra.me.chess.scripts.managers.GameManager;
 import kyra.me.chess.scripts.managers.GameState;
+import kyra.me.chess.scripts.players.AI;
 import kyra.me.chess.scripts.players.Player;
 import kyra.me.chess.scripts.tile.Tile;
 
@@ -203,6 +203,13 @@ public class PlayController {
                     GameManager.gameState = GameState.whiteWon;
                 }
                 GameManager.endGame();
+            }
+            if (remainingDuration[0].lessThanOrEqualTo(Duration.minutes(1))) {
+                if(playerIsWhite && GameManager.playerOne instanceof AI){
+                    ((AI) GameManager.playerOne).setTightOnTime(true);
+                } else if (!playerIsWhite && GameManager.playerTwo instanceof AI){
+                    ((AI) GameManager.playerTwo).setTightOnTime(true);
+                }
             }
         });
         timeline.getKeyFrames().addAll(keyFrame);

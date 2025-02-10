@@ -2,13 +2,9 @@ package kyra.me.chess.scripts.move;
 
 import kyra.me.chess.scripts.managers.Database;
 import kyra.me.chess.scripts.managers.GameManager;
-import kyra.me.chess.scripts.pieces.King;
 import kyra.me.chess.scripts.pieces.Pawn;
 import kyra.me.chess.scripts.pieces.Piece;
 import kyra.me.chess.scripts.tile.Tile;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public abstract class Move {
     final Piece movingPiece;
@@ -20,8 +16,9 @@ public abstract class Move {
     boolean isCheck;
 
     //stores the variables in GameManager so it can do and undo moves
-    boolean movingPieceHasMoved;
     Move lastMove;
+    int turnCount;
+    boolean movingPieceHasMoved;
     boolean kingInCheck;
     boolean kingInDoubleCheck;
 
@@ -86,6 +83,12 @@ public abstract class Move {
         GameManager.isCheck = false;
         GameManager.isDoubleCheck = false;
         GameManager.lastMove = this;
+
+        this.turnCount = GameManager.drawTurnCount;
+        if (this.isCapture() || this.getMovingPiece() instanceof Pawn){
+            GameManager.drawTurnCount = 0;
+        }
+        else { GameManager.drawTurnCount++; }
     }
     public void undoMove(){
         if (isCapture){
@@ -102,6 +105,12 @@ public abstract class Move {
         movingPiece.setOccupiedTile(startingSquare);
 
         GameManager.isWhiteTurn = !GameManager.isWhiteTurn;
+        GameManager.drawTurnCount = this.turnCount;
+    }
+
+    @Override
+    public String toString(){
+        return "moving piece: " + movingPiece + " starting square: " + startingSquare.getXPosition() + " " + startingSquare.getYPosition() + " ending square: " + endingSquare.getXPosition() + " " + endingSquare.getYPosition();
     }
 
     public boolean isCheck() { return isCheck; }

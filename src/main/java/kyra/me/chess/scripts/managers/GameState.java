@@ -2,8 +2,8 @@ package kyra.me.chess.scripts.managers;
 
 public enum GameState {
     normal("normal"),
-    whiteWon("white won!"),
-    blackWon("black won!"),
+    whiteWon(GameManager.playerOne.toString() + " won!"),
+    blackWon(GameManager.playerTwo.toString() + " won!"),
     draw("draw"),;
     private final String state;
     GameState(String state) {
