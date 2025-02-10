@@ -21,10 +21,11 @@ public abstract class Player {
     }
 
     public static void generateProfiles(){
-        new HumanPlayer("/kyra/me/chess/assets/models/profiles/colette.jpg", "Colette");
+        new HumanPlayer("/kyra/me/chess/assets/models/profiles/PlayerOne.jpg", "Player one");
+        new HumanPlayer("/kyra/me/chess/assets/models/profiles/PlayerTwo.jpg", "Player two");
         new LevelOneAI("/kyra/me/chess/assets/models/profiles/faith.jpg", "Faith (bot)");
         new LevelTwoAI("/kyra/me/chess/assets/models/profiles/ganyu.jpg", "Ganyu (bot)");
-        new LevelThreeAI("/kyra/me/chess/assets/models/profiles/colette AI.jpg", "Colette (bot)");
+        new LevelThreeAI("/kyra/me/chess/assets/models/profiles/colette.jpg", "Colette (bot)");
     }
 
     public Image getProfilePicture() { return profilePicture; }
