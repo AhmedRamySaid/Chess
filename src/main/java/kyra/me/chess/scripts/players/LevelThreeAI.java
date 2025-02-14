@@ -7,6 +7,7 @@ import kyra.me.chess.scripts.pieces.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import static kyra.me.chess.scripts.managers.GameManager.isWhiteTurn;
 import static kyra.me.chess.scripts.managers.GameManager.moveCreation;

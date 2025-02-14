@@ -59,6 +59,7 @@ public abstract class Move {
         for (Move m: movingPiece.getMoves()){
             m.getEndingSquare().togglePlayableMoveOff();
         }
+
         GameManager.lastMove = this;
     }
 
@@ -110,6 +111,23 @@ public abstract class Move {
     @Override
     public String toString(){
         return "moving piece: " + movingPiece + " starting square: " + startingSquare.getXPosition() + " " + startingSquare.getYPosition() + " ending square: " + endingSquare.getXPosition() + " " + endingSquare.getYPosition();
+    }
+    @Override
+    public boolean equals(Object obj){
+        if (obj.getClass() != this.getClass()){
+            return false;
+        }
+        Move m = (Move)obj;
+        if (!this.movingPiece.equals(m.movingPiece)) {
+            return false;
+        }
+        if (!this.startingSquare.equals(m.startingSquare)) {
+            return false;
+        }
+        if (!this.endingSquare.equals(m.endingSquare)) {
+            return false;
+        }
+        return true;
     }
 
     public boolean isCapture() { return isCapture; }

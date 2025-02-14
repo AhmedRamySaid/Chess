@@ -92,6 +92,21 @@ public abstract class Piece extends ImageView {
         this.fitHeightProperty().bind(getStackPane().prefHeightProperty());
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj.getClass() != this.getClass()) {
+            return false;
+        }
+        Piece p = (Piece) obj;
+        if (p.isWhite != this.isWhite) {
+            return false;
+        }
+        if (!p.occupiedTile.equals(occupiedTile)) {
+            return false;
+        }
+        return true;
+    }
+
     public List<Move> getMoves() { return Database.getMoves().stream().filter(t -> t.getMovingPiece() == this).collect(Collectors.toList()); }
     public StackPane getStackPane() { return (StackPane)getParent(); }
     public Tile getOccupiedTile() { return occupiedTile; }

@@ -26,10 +26,12 @@ public class GameManager {
     public static boolean isWhiteTurn = true;
     public static boolean isWhiteTurnTemp = true;
     public static Clip[] audio = new Clip[3];
+
     public static GameState gameState;
     public static Move lastMove;
     public static Player playerOne;
     public static Player playerTwo;
+
     public static int turnCount;
     public static int drawTurnCount; //used to decide if the game is a draw
     public static boolean isCheck;
@@ -166,7 +168,6 @@ public class GameManager {
         isDoubleCheck = false;
         if (lastMove != null) {
             isWhiteTurn = !isWhiteTurn;
-            isWhiteTurnTemp = isWhiteTurn;
             turnCount++;
             if (lastMove.isCapture() || lastMove.getMovingPiece() instanceof Pawn){
                 drawTurnCount = 0;
@@ -176,6 +177,8 @@ public class GameManager {
                 rotateProfilesAndTimer();
             }
         }
+
+        isWhiteTurnTemp = isWhiteTurn;
         isEarlyGame = turnCount <= 15;
         Database.clearMoves();
         moveCreation(Database.getMoves());

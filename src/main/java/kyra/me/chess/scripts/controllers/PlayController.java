@@ -53,12 +53,13 @@ public class PlayController {
             profileImage.setFitHeight(50);
             Label nameLabel = new Label(player.getName());
 
-            HBox profileEntry = new HBox(10, profileImage, nameLabel);
-            profileEntry.setOnMouseClicked(event -> {
+            //creates the profile options and adds them to the lists
+            HBox profileEntry1 = new HBox(10, profileImage, nameLabel);
+            profileEntry1.setOnMouseClicked(event -> {
                 selectProfile(selectedProfileName1, selectedProfileImage1, player);
                 GameManager.playerOne = player;
             });
-            profileList1.getChildren().add(profileEntry);
+            profileList1.getChildren().add(profileEntry1);
 
 
             ImageView profileImage2 = new ImageView(player.getProfilePicture());
@@ -178,13 +179,17 @@ public class PlayController {
 
     //Helper method to set the timers for each player
     private void setTimer(Label timerLabel, boolean playerIsWhite) {
-        // Initial duration for the timer (5 minutes and 1 second)
         Duration initialDuration = Duration.minutes(5);
-        Duration[] remainingDuration = { initialDuration }; // Mutable state for remaining time
+        Duration[] remainingDuration = { initialDuration }; //Mutable state for remaining time
 
-        //Create a Timeline to update the timer every second
+        //Creates a Timeline to update the timer every second
         Timeline timeline = new Timeline();
         KeyFrame keyFrame = new KeyFrame(Duration.seconds(1), event -> {
+            if (GameManager.gameState != GameState.normal) {
+                timeline.stop();
+                timeline.getKeyFrames().clear();
+            }
+
             if (playerIsWhite == GameManager.isWhiteTurnTemp) {
                 // Decrease the remaining duration by 1 second
                 remainingDuration[0] = remainingDuration[0].subtract(Duration.seconds(1));
