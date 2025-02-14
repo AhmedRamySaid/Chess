@@ -35,11 +35,8 @@ public class LevelThreeAI extends AI {
         return m;
     }
 
-    public float Evaluate(){
+    public float Evaluate(int depth){
         int myColor = this.isWhite? 1 : -1; //make result always positive if in AI's favour
-
-        float gameEnded = this.checkGameEnded();
-        if (gameEnded != -1) { return gameEnded; }
 
         float evaluation = 0;
         for (Piece piece: Database.getPieces()){
@@ -65,6 +62,7 @@ public class LevelThreeAI extends AI {
             }
             evaluation += evaluatePiece(piece) * color;
         }
+        evaluation += forceKingToCornerEndgameEval() * myColor;
         return evaluation * myColor;
     }
 
@@ -75,15 +73,18 @@ public class LevelThreeAI extends AI {
     }
 
     private float search(int depth, int origDepth, Move[] bestMove, boolean myChoice, float alpha, float beta) {
-        if (depth == 0) {
-            return Evaluate();
-        }
-
         List<Move> moves = new ArrayList<>();
         moveCreation(moves);
 
-        float gameEnded = this.checkGameEnded(moves);
-        if (gameEnded != -1) { return gameEnded; }
+        float gameEnded = super.checkGameEnded(moves);
+
+        if (gameEnded != -1) {
+            return gameEnded * (depth + 1);
+        }
+
+        if (depth == 0) {
+            return Evaluate(depth);
+        }
 
         float bestEvaluation = myChoice ? Float.NEGATIVE_INFINITY : Float.POSITIVE_INFINITY;
         int bestMoveIndex = -1;
@@ -99,9 +100,6 @@ public class LevelThreeAI extends AI {
                 if (evaluation > bestEvaluation) {
                     bestEvaluation = evaluation;
                     bestMoveIndex = i;
-                    if (depth == 4){
-                        System.out.print("");
-                    }
                 }
                 alpha = Math.max(alpha, bestEvaluation);
             } else {  // Minimizing player (Opponent)
@@ -130,14 +128,20 @@ public class LevelThreeAI extends AI {
 
         int tileX = piece.getOccupiedTile().getXPosition();
         int tileY = piece.getOccupiedTile().getYPosition();
-        int tile = tileX + (tileY-1) * 8;
 
         switch(piece){
             case Pawn pawn:
                 int startY = piece.isWhite()? 2 : 7;
-                if ((tileX == 4 || tileX == 5) && tileY == startY) {
-                    evaluation += -0.5F;
+                if (tileX == 4 || tileX == 5) {
+                    if (tileY == startY){
+                        evaluation += -0.3F;
+                    }
+                    else if (Math.abs(tileY - startY) == 1){
+                        evaluation -= 0.1F;
+                    }
+                    else evaluation += 0.3F;
                 }
+
                 break;
             case Knight knight:
                 if (tileY == 1 || tileY == 8) { break; }
@@ -157,12 +161,12 @@ public class LevelThreeAI extends AI {
             case Queen queen:
                 break;
             case King king:
-                startY = piece.isWhite()? 1 : 8;
+                int startYPos = piece.isWhite()? 1 : 8;
                 if (Database.getPieces().size() > 10) {
                     if (tileX == 1 || tileX == 8) { evaluation += 0.3F; }
                     else if (tileX == 2 || tileX == 7) { evaluation += 0.5F; }
 
-                    if (Math.abs(tileY - startY) > 1) {
+                    if (Math.abs(tileY - startYPos) > 1) {
                         evaluation -= 1;
                     }
                 }
@@ -172,5 +176,33 @@ public class LevelThreeAI extends AI {
         }
 
         return evaluation;
+    }
+
+    private float forceKingToCornerEndgameEval(){
+        float evaluation = 0;
+        float endgameWeight = (float) 2 / Database.getPieces().size();
+
+        Piece myKing = Database.getPieces().stream().filter(t -> t instanceof King && t.isWhite() == this.isWhite).findFirst().get();
+        Piece opponentKing = Database.getPieces().stream().filter(t -> t instanceof King && t.isWhite() != this.isWhite).findFirst().get();
+
+        int opponentKingXPos = opponentKing.getOccupiedTile().getXPosition();
+        int opponentKingYPos = opponentKing.getOccupiedTile().getYPosition();
+
+        //forces opponent king into the corner
+        int opponentKingDstToCenterX = Math.max(3 - opponentKingXPos, opponentKingXPos - 4);
+        int opponentKingDstToCenterY = Math.max(3 - opponentKingYPos, opponentKingYPos - 4);
+        int opponentKingDstFromCenter = opponentKingDstToCenterX + opponentKingDstToCenterY;
+        evaluation += opponentKingDstFromCenter;
+
+        //gets my king next to the opponent's king
+        int myKingXPos = myKing.getOccupiedTile().getXPosition();
+        int myKingYPos = myKing.getOccupiedTile().getYPosition();
+
+        int xDstBetweenKings = Math.abs(opponentKingXPos - myKingXPos);
+        int yDstBetweenKings = Math.abs(opponentKingYPos - myKingYPos);
+        int dstBetweenKings = xDstBetweenKings + yDstBetweenKings;
+        evaluation += 14 - dstBetweenKings;
+
+        return evaluation * endgameWeight;
     }
 }

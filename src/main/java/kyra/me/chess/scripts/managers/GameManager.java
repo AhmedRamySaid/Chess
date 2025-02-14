@@ -176,7 +176,7 @@ public class GameManager {
                 rotateProfilesAndTimer();
             }
         }
-        isEarlyGame = turnCount <= 10;
+        isEarlyGame = turnCount <= 15;
         Database.clearMoves();
         moveCreation(Database.getMoves());
         playAudio();

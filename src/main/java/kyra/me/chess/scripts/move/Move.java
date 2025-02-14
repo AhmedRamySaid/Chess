@@ -13,7 +13,6 @@ public abstract class Move {
     final Tile endingSquare;
     final MoveType moveType;
     final boolean isCapture;
-    boolean isCheck;
 
     //stores the variables in GameManager so it can do and undo moves
     Move lastMove;
@@ -113,12 +112,10 @@ public abstract class Move {
         return "moving piece: " + movingPiece + " starting square: " + startingSquare.getXPosition() + " " + startingSquare.getYPosition() + " ending square: " + endingSquare.getXPosition() + " " + endingSquare.getYPosition();
     }
 
-    public boolean isCheck() { return isCheck; }
     public boolean isCapture() { return isCapture; }
     public Tile getStartingSquare() { return startingSquare; }
     public Tile getEndingSquare() { return endingSquare; }
     public Piece getMovingPiece() { return movingPiece; }
     public Piece getCapturedPiece() { return capturedPiece; }
     public MoveType getType() { return moveType; }
-    public void setIsCheck(boolean isCheck) { this.isCheck = isCheck; }
 }
