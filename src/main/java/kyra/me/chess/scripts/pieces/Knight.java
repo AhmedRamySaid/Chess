@@ -9,6 +9,11 @@ import kyra.me.chess.scripts.tile.Tile;
 import java.util.List;
 
 public class Knight extends Piece {
+    private static final int[][] KNIGHT_MOVES = {
+            {-2, -1}, {-2, 1}, {2, -1}, {2, 1},
+            {-1, -2}, {-1, 2}, {1, -2}, {1, 2}
+    };
+
     public Knight(boolean isWhite) {
         this(null, isWhite);
     }
@@ -26,31 +31,21 @@ public class Knight extends Piece {
         if (GameManager.isDoubleCheck) return;
 
         if (occupiedTile.isUnderPin()) return;
-        int[] values = {1, 2};
 
-        // Iterate through {1, 2}, {-1, 2}, {1, -2}, {-1, -2}
-        for (int i = 0; i < 4; i++) {
-            Tile t = Database.getTile(occupiedTile.getXPosition() + values[0], occupiedTile.getYPosition() + values[1]);
+        //Iterates through all possible combination of moves for a knight
+        Tile t;
+        for (int[] move : KNIGHT_MOVES) {
+            t = Database.getTile(occupiedTile.getXPosition() + move[0],occupiedTile.getYPosition() + move[1]);
             this.addMove(moves, t);
-            t = Database.getTile(occupiedTile.getXPosition() + values[1], occupiedTile.getYPosition() + values[0]);
-            this.addMove(moves, t);
-
-            // Perform the transformation
-            if (i % 2 == 0) {
-                values[0] = -values[0];  // Toggle the first value
-            } else {
-                values[1] = -values[1];  // Toggle the second value
-            }
         }
     }
 
     @Override
     public void createAttacks(){
-        int[] values = {1, 2};
-
-        // Iterate through {1, 2}, {-1, 2}, {1, -2}, {-1, -2}
-        for (int i = 0; i < 4; i++) {
-            Tile t = Database.getTile(occupiedTile.getXPosition() + values[0], occupiedTile.getYPosition() + values[1]);
+        //Iterates through all possible combination of moves for a knight
+        Tile t;
+        for (int[] move : KNIGHT_MOVES) {
+            t = Database.getTile(occupiedTile.getXPosition() + move[0],occupiedTile.getYPosition() + move[1]);
             if (t != null) {
                 t.toggleUnderAttackOn();
                 if (t.getOccupyingPiece() instanceof King){
@@ -61,25 +56,6 @@ public class Knight extends Piece {
                         occupiedTile.toggleUnderCheckOn();
                     }
                 }
-            }
-            t = Database.getTile(occupiedTile.getXPosition() + values[1], occupiedTile.getYPosition() + values[0]);
-            if (t != null) {
-                t.toggleUnderAttackOn();
-                if (t.getOccupyingPiece() instanceof King){
-                    if (t.getOccupyingPiece().isWhite != isWhite){
-                        t.toggleUnderCheckOn();
-                        GameManager.isDoubleCheck = GameManager.isCheck;
-                        GameManager.isCheck = true;
-                        occupiedTile.toggleUnderCheckOn();
-                    }
-                }
-            }
-
-            // Perform the transformation
-            if (i % 2 == 0) {
-                values[0] = -values[0];  // Toggle the first value
-            } else {
-                values[1] = -values[1];  // Toggle the second value
             }
         }
     }

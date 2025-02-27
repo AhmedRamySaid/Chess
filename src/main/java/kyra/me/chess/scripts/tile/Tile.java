@@ -25,7 +25,7 @@ public class Tile extends Rectangle {
         yPosition = y;
 
         playableMove = new Circle();
-        playableMove.radiusProperty().bind(widthProperty().divide(6));
+        playableMove.radiusProperty().bind(this.widthProperty().divide(6));
         playableMove.setFill(Color.RED);
         playableMove.setOpacity(0);
         isUnderAttack = false;
