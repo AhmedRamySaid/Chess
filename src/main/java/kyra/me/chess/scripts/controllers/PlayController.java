@@ -9,9 +9,12 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import kyra.me.chess.Chess;
@@ -81,67 +84,93 @@ public class PlayController {
         selectedImageView.setImage(player.getProfilePicture());
     }
 
-    @FXML
-    protected void onStartButtonClicked() throws IOException {
-        if (GameManager.playerOne == null || GameManager.playerTwo == null) { return; }
+	@FXML
+	protected void onStartButtonClicked() throws IOException {
+		if (GameManager.playerOne == null || GameManager.playerTwo == null) { return; }
 
-        Stage primaryStage = Chess.primaryStage;
+		Stage primaryStage = Chess.primaryStage;
 
-        //Create the GridPane for the chessboard
-        GridPane gridPane = new GridPane();
-        Chess.board = gridPane;
-        gridPane.setAlignment(Pos.CENTER);
+		// ── Board Grid ────────────────────────────────────────────────────────────
+		GridPane gridPane = new GridPane();
+		Chess.board = gridPane;
+		gridPane.setAlignment(Pos.CENTER);
 
-        //Create a StackPane to hold the grid
-        VBox centerPane = new VBox();
-        Chess.sceneVBox = centerPane;
-        centerPane.setAlignment(Pos.CENTER_RIGHT);
-        centerPane.setStyle("-fx-background-color: cyan");
+		// Subtle drop-shadow beneath the board
+		DropShadow boardShadow = new DropShadow();
+		boardShadow.setColor(Color.color(0, 0, 0, 0.6));
+		boardShadow.setRadius(24);
+		boardShadow.setOffsetY(8);
+		gridPane.setEffect(boardShadow);
 
-        //Set padding to scale with the smaller side length of the window
-        NumberBinding binding = Bindings.min(primaryStage.widthProperty(), primaryStage.heightProperty());
+		// ── Tiles ─────────────────────────────────────────────────────────────────
+		NumberBinding binding = Bindings.min(primaryStage.widthProperty(), primaryStage.heightProperty());
 
-        //Instantiate the tiles
-        for (int i = 1; i <= 8; i++) {
-            for (int j = 1; j <= 8; j++) {
-                StackPane stackPane = new StackPane();
-                new Tile(i, j, stackPane);
-                stackPane.prefWidthProperty().bind(binding.divide(12));
-                stackPane.prefHeightProperty().bind(binding.divide(12));
+		for (int i = 1; i <= 8; i++) {
+			for (int j = 1; j <= 8; j++) {
+				StackPane stackPane = new StackPane();
+				new Tile(i, j, stackPane);
+				stackPane.prefWidthProperty().bind(binding.divide(11));
+				stackPane.prefHeightProperty().bind(binding.divide(11));
+				gridPane.add(stackPane, i - 1, 8 - j);
+			}
+		}
 
-                gridPane.add(stackPane, i-1, 8-j); // GridPane starts from {0,0} and the top left
-            }
-        }
+		// ── Timers ────────────────────────────────────────────────────────────────
+		Label playerOneTimerLabel = createTimerLabel();
+		Label playerTwoTimerLabel = createTimerLabel();
+		setTimer(playerOneTimerLabel, true);
+		setTimer(playerTwoTimerLabel, false);
 
-        //adds the timers for both players
-        Label playerOneTimerLabel = new Label();
-        Label playerTwoTimerLabel = new Label();
+		// ── Board Column (timers + board) ─────────────────────────────────────────
+		VBox centerPane = new VBox(10);
+		Chess.sceneVBox = centerPane;
+		centerPane.setAlignment(Pos.CENTER);
+		centerPane.setPadding(new Insets(28));
 
-        playerOneTimerLabel.setFont(new Font(36));
-        playerTwoTimerLabel.setFont(new Font(36));
-        setTimer(playerOneTimerLabel, false);
-        setTimer(playerTwoTimerLabel, true);
-        centerPane.getChildren().addAll(playerOneTimerLabel, gridPane, playerTwoTimerLabel);
+		// Board label strip (rank/file decorations optional — just spacing here)
+		centerPane.getChildren().addAll(playerTwoTimerLabel, gridPane, playerOneTimerLabel);
 
-        //Create a VBox to hold the profile info for Player 1 and Player 2
-        VBox profileBox = createProfileBox(GameManager.playerOne, GameManager.playerTwo);
-        Chess.playersProfiles = profileBox;
-        profileBox.spacingProperty().bind(binding.divide(2));
+		// ── Profiles ──────────────────────────────────────────────────────────────
+		VBox profileBox = createProfileBox(GameManager.playerOne, GameManager.playerTwo);
+		Chess.playersProfiles = profileBox;
+		profileBox.setSpacing(40);
+		profileBox.setAlignment(Pos.CENTER);
+		profileBox.setPadding(new Insets(32, 28, 32, 20));
+		profileBox.setMinWidth(210);
+		profileBox.setMaxWidth(260);
+		profileBox.setStyle(
+				"-fx-background-color: #1a1210;" +
+						"-fx-border-color: #7a5c2e;" +
+						"-fx-border-width: 0 0 0 1;"   // left gold separator line
+		);
 
-        //Create a BorderPane to arrange the grid and the profiles side by side
-        BorderPane layout = new BorderPane();
-        layout.setCenter(centerPane); // Center the chess grid
-        layout.setRight(profileBox); // Set the profile display to the right of the grid
+		// ── Root Layout ───────────────────────────────────────────────────────────
+		BorderPane layout = new BorderPane();
+		layout.setStyle("-fx-background-color: #110e0c;"); // deep espresso bg
+		layout.setCenter(centerPane);
+		layout.setRight(profileBox);
 
-        //Add space to the right of the profileBox to prevent sticking to the edge
-        BorderPane.setMargin(profileBox, new Insets(10, 20, 10, 10));
+		BorderPane.setMargin(centerPane, new Insets(0, 0, 0, 16));
+		BorderPane.setMargin(profileBox, new Insets(0, 0, 0, 0));
 
-        //Set the layout as the scene root
-        primaryStage.setScene(new Scene(layout, 800, 600)); // Adjust the size as needed
+		primaryStage.getScene().setRoot(layout);
 
-        //Start the game
-        GameManager.gameStart();
-    }
+		// ── Start ─────────────────────────────────────────────────────────────────
+		GameManager.gameStart();
+	}
+
+	// ── Helper: styled timer label ────────────────────────────────────────────────
+	private Label createTimerLabel() {
+		Label label = new Label();
+		label.setFont(Font.font("Courier New", FontWeight.BOLD, 34));
+		label.setTextFill(Color.web("#c9a84c"));        // warm gold
+		label.setStyle(
+				"-fx-background-color: #1e1814;" +
+						"-fx-background-radius: 6;" +
+						"-fx-padding: 6 18 6 18;"
+		);
+		return label;
+	}
 
     //Helper method to create the profile display
     private VBox createProfileBox(Player playerOne, Player playerTwo) {
@@ -151,7 +180,6 @@ public class PlayController {
         VBox profileBox = new VBox(profileTwo, profileOne);
 
         profileBox.setAlignment(Pos.CENTER);
-        profileBox.setStyle("-fx-background-color: cyan;");
         return profileBox;
     }
 
@@ -173,7 +201,6 @@ public class PlayController {
         //Create an HBox for displaying the image and name
         HBox profileDisplay = new HBox(10, nameLabel, profileImage);
         profileDisplay.setAlignment(Pos.CENTER);
-        profileDisplay.setStyle("-fx-background-color: cyan;"); // Match the background color of the profile box
         return profileDisplay;
     }
 

@@ -257,6 +257,7 @@ public class GameManager {
                 scene = mainMenu.load(); }
             catch (IOException ex) { System.out.println(ex); }
             primaryStage.setScene(scene);
+            primaryStage.setFullScreen(true);
         });
     }
 
