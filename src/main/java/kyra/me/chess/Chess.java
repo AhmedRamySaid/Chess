@@ -34,6 +34,7 @@ public class Chess extends Application {
         FXMLLoader mainMenu = new FXMLLoader(getClass().getResource("/kyra/me/chess/scenes/main-menu.fxml"));
         Scene scene = mainMenu.load();
         primaryStage.setScene(scene);
+        primaryStage.setFullScreen(true);
     }
 
     public static void main(String[] args) {
