@@ -119,7 +119,7 @@ public class PlayController {
 		Label playerOneTimerLabel = createTimerLabel();
 		Label playerTwoTimerLabel = createTimerLabel();
 		setTimer(playerOneTimerLabel, true);
-		setTimer(playerTwoTimerLabel, false);
+		setTimer(playerTwoTimerLabel, false );
 
 		// ── Board Column (timers + board) ─────────────────────────────────────────
 		VBox centerPane = new VBox(10);
