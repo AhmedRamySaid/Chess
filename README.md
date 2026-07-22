@@ -1,18 +1,18 @@
 # High-Performance Java 23 Chess Engine & Validation Suite
 
-A modular Java 23 chess engine featuring dynamic transposition tables, depth extensions, and parallelized alpha-beta search. Includes an integrated Stockfish evaluation pipeline benchmarked across 3+ billion chess positions.
+Chess app that includes highly optimized chess engines of various difficulty
 
 ---
 
 ## Key Features
 
-- **Minimax search with Alpha-Beta pruning**
+- Minimax search with Alpha-Beta pruning
 
 
-- **Uses a complex algorithm inspired by ray-tracing algorithms to draw imaginary lines from pieces to evaluate legal moves, reducing algorithm complexity to O(n) from O(n²) for standard chess algorithms**
+- Uses a complex algorithm inspired by ray-tracing algorithms to draw imaginary lines from pieces to evaluate legal moves, reducing algorithm complexity to O(n) from O(n²) for standard chess algorithms
 
 
-- **Tested and validated against stockfish across over 3 billion chess positions**
+- Tested and validated against stockfish across over 3 billion chess positions to validate move legality
    
 ---
 
@@ -33,4 +33,4 @@ A modular Java 23 chess engine featuring dynamic transposition tables, depth ext
 
 ### Quickstart
 
-- **Simply run the JAR file included in the repo**
+- Simply download and extract the zip file found at https://github.com/AhmedRamySaid/Chess/releases/tag/1.0 then run the exe
